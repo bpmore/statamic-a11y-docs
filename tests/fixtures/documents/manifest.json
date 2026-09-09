@@ -1,0 +1,942 @@
+{
+    "generated_by": "tools/build-fixtures.php",
+    "description": "Deliberately broken (and deliberately correct) documents, with the findings each one is expected to produce.",
+    "severities": [
+        "critical",
+        "serious",
+        "moderate",
+        "minor"
+    ],
+    "statuses": [
+        "pass",
+        "fail",
+        "error",
+        "skipped",
+        "unsupported"
+    ],
+    "count": 45,
+    "fixtures": [
+        {
+            "path": "docx/alt-text-is-filename.docx",
+            "format": "docx",
+            "status": "fail",
+            "bytes": 3641,
+            "sha256": "c79b20cf7811a8fb5886cc194715973b874265b3271bb80fbbd0a5f8433e8d23",
+            "summary": "Alt text is present on every image; three are filenames and one is a default shape name.",
+            "expect": [
+                {
+                    "rule": "docx.alt_text_is_filename",
+                    "severity": "critical",
+                    "count": 3
+                },
+                {
+                    "rule": "docx.alt_text_not_descriptive",
+                    "severity": "critical",
+                    "count": 1
+                }
+            ],
+            "expect_absent": [
+                "docx.image_missing_alt",
+                "docx.no_title",
+                "docx.no_lang"
+            ],
+            "notes": "Presence is not quality. Image 5 carries \"Picture 3\" — a default Word shape name rather than a filename — and is reported under its own rule: the two are the same failure for a reader but different mistakes to explain, and separating them keeps each message specific."
+        },
+        {
+            "path": "docx/complex-table.docx",
+            "format": "docx",
+            "status": "fail",
+            "bytes": 3181,
+            "sha256": "aa227e7136653048ece3b71634ef6363d1bca3c1f064911ccdc67330189a6d81",
+            "summary": "One table using both w:gridSpan and w:vMerge. Its header row is correctly marked.",
+            "expect": [
+                {
+                    "rule": "docx.complex_table",
+                    "severity": "moderate",
+                    "count": 1
+                }
+            ],
+            "expect_absent": [
+                "docx.table_missing_header_row",
+                "docx.no_title",
+                "docx.no_lang"
+            ],
+            "notes": "Header row is present on purpose: complexity and a missing header are independent problems, and this fixture must not trip the header rule."
+        },
+        {
+            "path": "docx/form-controls-untitled.docx",
+            "format": "docx",
+            "status": "fail",
+            "bytes": 3056,
+            "sha256": "12db4bcf856a89c4d66401be2ea6a52babd88bd6d23af2213a4735eca9e99529",
+            "summary": "Three w:sdt content controls; only the first has a w:alias title.",
+            "expect": [
+                {
+                    "rule": "docx.content_control_untitled",
+                    "severity": "serious",
+                    "count": 2
+                }
+            ],
+            "expect_absent": [
+                "docx.no_title",
+                "docx.no_lang",
+                "docx.no_headings"
+            ],
+            "notes": "All three have a w:tag. A tag is a developer identifier, not a label; only w:alias is announced."
+        },
+        {
+            "path": "docx/good.docx",
+            "format": "docx",
+            "status": "pass",
+            "bytes": 3922,
+            "sha256": "a3233c2ccbcf740c953c182427738822cdcae9c5ecde9bdac8dad8ba8c0398c7",
+            "summary": "Title, language, heading styles, described image, table with a repeating header row, meaningful link text.",
+            "expect": [],
+            "expect_absent": [
+                "docx.image_missing_alt",
+                "docx.alt_text_is_filename",
+                "docx.no_headings",
+                "docx.table_missing_header_row",
+                "docx.complex_table",
+                "docx.link_text_not_meaningful",
+                "docx.no_title",
+                "docx.no_lang",
+                "docx.document_protected",
+                "docx.content_control_untitled"
+            ],
+            "notes": "The primary negative control for Word."
+        },
+        {
+            "path": "docx/header-image-missing-alt.docx",
+            "format": "docx",
+            "status": "fail",
+            "bytes": 4560,
+            "sha256": "10b05429ddca276686945e83e797b8a7fca176c8285a42614705bbc817b0ce74",
+            "summary": "An undescribed logo in word/header1.xml, and a properly described chart in the body.",
+            "expect": [
+                {
+                    "rule": "docx.image_missing_alt",
+                    "severity": "critical",
+                    "count": 1
+                }
+            ],
+            "expect_absent": [
+                "docx.alt_text_is_filename",
+                "docx.no_title",
+                "docx.no_lang",
+                "docx.no_headings"
+            ],
+            "notes": "Headers and footers are separate parts with their own relationships, so a rule that only reads word/document.xml misses every letterhead logo in the library — which is most of them. The body image is described, so the single finding must come from the header."
+        },
+        {
+            "path": "docx/image-missing-alt.docx",
+            "format": "docx",
+            "status": "fail",
+            "bytes": 3585,
+            "sha256": "e8363a5e156da724ffb3bbb9245bed7347950a01f00bdc3f7ea789306e98aa31",
+            "summary": "Three images: one described, one with descr=\"\", one with no descr attribute at all.",
+            "expect": [
+                {
+                    "rule": "docx.image_missing_alt",
+                    "severity": "critical",
+                    "count": 2
+                }
+            ],
+            "expect_absent": [
+                "docx.alt_text_is_filename",
+                "docx.no_headings",
+                "docx.no_title",
+                "docx.no_lang"
+            ],
+            "notes": "Absent and empty are different in the XML and identical to a screen reader user; both must be reported. The described image must not be."
+        },
+        {
+            "path": "docx/link-text-not-meaningful.docx",
+            "format": "docx",
+            "status": "fail",
+            "bytes": 3231,
+            "sha256": "a783bd2c3cf5c29689b00ec6b2acb3c549c94871834fbf5a187a6541cac211a9",
+            "summary": "Four hyperlinks: one descriptive, one \"click here\", one bare URL, one \"Read more\".",
+            "expect": [
+                {
+                    "rule": "docx.link_text_not_meaningful",
+                    "severity": "serious",
+                    "count": 3
+                }
+            ],
+            "expect_absent": [
+                "docx.no_headings",
+                "docx.no_title",
+                "docx.no_lang"
+            ],
+            "notes": "Matching must be case-insensitive: the fixture uses \"Read more\", not \"read more\". The descriptive link must not be reported."
+        },
+        {
+            "path": "docx/no-headings.docx",
+            "format": "docx",
+            "status": "fail",
+            "bytes": 3108,
+            "sha256": "23c591be82fa75ce9e91d66674cd84954844a7408e39b7f0359d4de5d93d6726",
+            "summary": "30 body paragraphs, not one of them using a Heading style.",
+            "expect": [
+                {
+                    "rule": "docx.no_headings",
+                    "severity": "serious",
+                    "count": 1
+                }
+            ],
+            "expect_absent": [
+                "docx.no_title",
+                "docx.no_lang",
+                "docx.image_missing_alt"
+            ],
+            "notes": "One finding for the document, not one per paragraph. The rule needs a paragraph-count threshold so a two-line memo is not reported."
+        },
+        {
+            "path": "docx/no-title-no-lang.docx",
+            "format": "docx",
+            "status": "fail",
+            "bytes": 2931,
+            "sha256": "e1afeabebf76c0429ebfeb33e73ec45f0b64e261114a613d4bb072033b1b5c1b",
+            "summary": "No dc:title in docProps/core.xml and no w:lang in the style defaults or any run.",
+            "expect": [
+                {
+                    "rule": "docx.no_title",
+                    "severity": "moderate",
+                    "count": 1
+                },
+                {
+                    "rule": "docx.no_lang",
+                    "severity": "serious",
+                    "count": 1
+                }
+            ],
+            "expect_absent": [
+                "docx.no_headings",
+                "docx.image_missing_alt"
+            ],
+            "notes": "The Heading 1 text reads \"Untitled Document\" — a visible heading is not a document title, and the rule must not read one as the other."
+        },
+        {
+            "path": "docx/protected.docx",
+            "format": "docx",
+            "status": "fail",
+            "bytes": 3115,
+            "sha256": "e727224e693b1e584b2c66707e9b8158188883cbad069f252fb9dbb4b812bc4d",
+            "summary": "word/settings.xml carries an enforced w:documentProtection element.",
+            "expect": [
+                {
+                    "rule": "docx.document_protected",
+                    "severity": "critical",
+                    "count": 1
+                }
+            ],
+            "expect_absent": [
+                "docx.no_title",
+                "docx.no_lang",
+                "docx.no_headings"
+            ],
+            "notes": "Enforcement is the part that matters: w:enforcement=\"0\" means the protection is recorded but not applied, and must not be reported."
+        },
+        {
+            "path": "docx/table-missing-header.docx",
+            "format": "docx",
+            "status": "fail",
+            "bytes": 3192,
+            "sha256": "cc866003f3cd4108871db8d0c6683907205b20a8afc270d4e7f162472fc3ab19",
+            "summary": "Two tables; only the first has w:trPr/w:tblHeader on its first row.",
+            "expect": [
+                {
+                    "rule": "docx.table_missing_header_row",
+                    "severity": "serious",
+                    "count": 1
+                }
+            ],
+            "expect_absent": [
+                "docx.complex_table",
+                "docx.no_headings",
+                "docx.no_title",
+                "docx.no_lang"
+            ],
+            "notes": "One finding per table, located to the table, not one for the document."
+        },
+        {
+            "path": "legacy/budget.xls",
+            "format": "xls",
+            "status": "unsupported",
+            "bytes": 1536,
+            "sha256": "47df107904e754c9cf24b1d5f1e36223e328efe09e43f905cbd750e8d5230c53",
+            "summary": "An OLE2 compound file carrying a \"Workbook\" stream — the binary format that predates OOXML.",
+            "expect": [],
+            "expect_absent": [],
+            "notes": "Detection is by the D0CF11E0A1B11AE1 signature plus the stream name, not by extension. Must be recorded as unsupported with a message the user can act on, never parsed and never reported as passing."
+        },
+        {
+            "path": "legacy/deck.ppt",
+            "format": "ppt",
+            "status": "unsupported",
+            "bytes": 1536,
+            "sha256": "3b18a340edcd5df22e44f1f538ca7d559bc7dda5715b9b1a376da3c9a6bb78e3",
+            "summary": "An OLE2 compound file carrying a \"PowerPoint Document\" stream — the binary format that predates OOXML.",
+            "expect": [],
+            "expect_absent": [],
+            "notes": "Detection is by the D0CF11E0A1B11AE1 signature plus the stream name, not by extension. Must be recorded as unsupported with a message the user can act on, never parsed and never reported as passing."
+        },
+        {
+            "path": "legacy/handbook.doc",
+            "format": "doc",
+            "status": "unsupported",
+            "bytes": 1536,
+            "sha256": "173ac9b34d6bc2af8948805f7749d3869ccdb6dee988de96d5b010eb9e69c7dd",
+            "summary": "An OLE2 compound file carrying a \"WordDocument\" stream — the binary format that predates OOXML.",
+            "expect": [],
+            "expect_absent": [],
+            "notes": "Detection is by the D0CF11E0A1B11AE1 signature plus the stream name, not by extension. Must be recorded as unsupported with a message the user can act on, never parsed and never reported as passing."
+        },
+        {
+            "path": "misc/actually-a-pdf.docx",
+            "format": "pdf",
+            "status": "fail",
+            "bytes": 1193,
+            "sha256": "7f71f0eeab4198ea9200a4f160f2942b0994d04cb06770ced09e289a55eb75ea",
+            "summary": "A PDF with a .docx extension. Someone renamed it; the asset library believes the extension.",
+            "expect": [
+                {
+                    "rule": "pdf.not_tagged",
+                    "severity": "critical",
+                    "count": 1
+                }
+            ],
+            "expect_absent": [
+                "docx.image_missing_alt",
+                "docx.no_title"
+            ],
+            "notes": "Format detection must sniff the content. Handing this file to the OOXML reader produces a ZIP error, which would be recorded as status=error and hide a real critical finding."
+        },
+        {
+            "path": "misc/empty.pdf",
+            "format": "pdf",
+            "status": "error",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "summary": "A zero-byte file with a .pdf extension.",
+            "expect": [],
+            "expect_absent": [],
+            "notes": "The cheapest possible crash: an empty file. Must be caught before any parser is invoked."
+        },
+        {
+            "path": "pdf/corrupt-truncated.pdf",
+            "format": "pdf",
+            "status": "error",
+            "bytes": 263,
+            "sha256": "5444dec72aeda2f478bead4714383abea67ce2c5bc6aef2a2f3878887b8c299b",
+            "summary": "Truncated mid-stream: no xref table, no trailer, no %%EOF, and a /Length that overruns the file.",
+            "expect": [],
+            "expect_absent": [],
+            "notes": "Must be recorded as status=error with the parser message preserved, never as a pass and never as an uncaught exception that fails the whole batch."
+        },
+        {
+            "path": "pdf/encrypted-accessible.pdf",
+            "format": "pdf",
+            "status": "pass",
+            "bytes": 1608,
+            "sha256": "c427b96fcbb35f9251305482e0c3b87d73ffe4118870c268178eb7000c0e8299",
+            "summary": "Same encryption as encrypted-no-extract.pdf, but only printing is restricted: /P -5.",
+            "expect": [],
+            "expect_absent": [
+                "pdf.extraction_blocked",
+                "pdf.not_tagged",
+                "pdf.no_title",
+                "pdf.no_lang",
+                "pdf.title_not_displayed"
+            ],
+            "notes": "The negative control for the encryption rule. \"Encrypted\" must never on its own mean \"inaccessible\" — only bit 10 does. Title and language are unreadable here without decryption, so the rules that read string values have to report that they could not check rather than that the document failed."
+        },
+        {
+            "path": "pdf/encrypted-no-extract.pdf",
+            "format": "pdf",
+            "status": "fail",
+            "bytes": 1600,
+            "sha256": "9be81bc5f72a1ab076047d37b3f7a096b631fedabecd0b5edff8c319b3347cae",
+            "summary": "RC4 128-bit, revision 3, empty user password, /P -529 — permission bit 10 cleared.",
+            "expect": [
+                {
+                    "rule": "pdf.extraction_blocked",
+                    "severity": "critical",
+                    "count": 1
+                }
+            ],
+            "expect_absent": [
+                "pdf.not_tagged",
+                "pdf.no_title",
+                "pdf.no_lang",
+                "pdf.title_not_displayed"
+            ],
+            "notes": "Opens without a password, so a reader that handles empty-user-password decryption still sees the tags. Revision 3 on purpose: revision 2 leaves bit 10 undefined, so clearing it there would mean nothing. Every string is encrypted, /Lang included, so a heuristics-only reader sees the key is present but cannot read its value — presence is what the language rule asks about, which is why it still holds here."
+        },
+        {
+            "path": "pdf/figure-missing-alt.pdf",
+            "format": "pdf",
+            "status": "fail",
+            "bytes": 1744,
+            "sha256": "9566f6e6c1d44a5a0872d011fff5ed6e06da9de4fc1b36951fd18d0abbaa726b",
+            "summary": "Two /Figure structure elements. One carries /Alt; the other carries neither /Alt nor /ActualText.",
+            "expect": [
+                {
+                    "rule": "pdf.figure_missing_alt",
+                    "severity": "serious",
+                    "count": 1
+                }
+            ],
+            "expect_absent": [
+                "pdf.not_tagged",
+                "pdf.no_title",
+                "pdf.no_lang",
+                "pdf.title_not_displayed"
+            ],
+            "notes": "Requires walking the structure tree, not just reading the catalog. Exactly one finding: the described figure must not be reported."
+        },
+        {
+            "path": "pdf/form-unlabelled-fields.pdf",
+            "format": "pdf",
+            "status": "fail",
+            "bytes": 2231,
+            "sha256": "65214c855bf50b32db8b4234f848b0b1d5d6db221a918e62b641c2e3171de5d7",
+            "summary": "Three form widgets. The first has /TU; the other two do not.",
+            "expect": [
+                {
+                    "rule": "pdf.unlabelled_form_fields",
+                    "severity": "serious",
+                    "count": 2
+                }
+            ],
+            "expect_absent": [
+                "pdf.not_tagged",
+                "pdf.no_title",
+                "pdf.no_lang",
+                "pdf.title_not_displayed"
+            ],
+            "notes": "The count matters: one finding per unlabelled field, not one per document, and the labelled field must not be reported. /T is a field name, not a label — a rule that accepts /T as a description will wrongly pass all three."
+        },
+        {
+            "path": "pdf/image-only-scan.pdf",
+            "format": "pdf",
+            "status": "fail",
+            "bytes": 1873,
+            "sha256": "58a8cd10d25d6272682f80c9bc6db82107e0303a1cb06d82e21b6db1048e9a9a",
+            "summary": "Two pages, each a single full-page greyscale bitmap. No fonts, no text operators, no metadata — a flatbed scan.",
+            "expect": [
+                {
+                    "rule": "pdf.image_only",
+                    "severity": "critical",
+                    "count": 1
+                },
+                {
+                    "rule": "pdf.not_tagged",
+                    "severity": "critical",
+                    "count": 1
+                },
+                {
+                    "rule": "pdf.no_title",
+                    "severity": "serious",
+                    "count": 1
+                },
+                {
+                    "rule": "pdf.title_not_displayed",
+                    "severity": "serious",
+                    "count": 1
+                },
+                {
+                    "rule": "pdf.no_lang",
+                    "severity": "serious",
+                    "count": 1
+                }
+            ],
+            "expect_absent": [
+                "pdf.no_tounicode"
+            ],
+            "notes": "Deliberately fails five rules at once, because that is what a real scan does. There is no /Font resource anywhere, so a font-walking rule must cope with its absence rather than error."
+        },
+        {
+            "path": "pdf/long-no-bookmarks.pdf",
+            "format": "pdf",
+            "status": "fail",
+            "bytes": 12003,
+            "sha256": "5cd1965035c11193d28432e5c60d653c17f000867edf8158594e4ea11c4a51a5",
+            "summary": "25 tagged pages, correct metadata, no /Outlines.",
+            "expect": [
+                {
+                    "rule": "pdf.no_bookmarks",
+                    "severity": "moderate",
+                    "count": 1
+                }
+            ],
+            "expect_absent": [
+                "pdf.not_tagged",
+                "pdf.no_title",
+                "pdf.no_lang",
+                "pdf.title_not_displayed"
+            ],
+            "notes": "Page count is 25, just over the threshold of 20. Pair with untagged.pdf (2 pages, no outlines, no finding) to pin the boundary."
+        },
+        {
+            "path": "pdf/long-with-bookmarks.pdf",
+            "format": "pdf",
+            "status": "pass",
+            "bytes": 12505,
+            "sha256": "44d652b8ee89e4270fe23faadec8e96939c127ea60c52da4ea767c68a331eb66",
+            "summary": "The same 25-page document with a three-entry /Outlines tree.",
+            "expect": [],
+            "expect_absent": [
+                "pdf.no_bookmarks",
+                "pdf.not_tagged",
+                "pdf.no_title",
+                "pdf.no_lang",
+                "pdf.title_not_displayed"
+            ],
+            "notes": "The negative control for the bookmark rule; catches an implementation that only checks page count."
+        },
+        {
+            "path": "pdf/no-lang.pdf",
+            "format": "pdf",
+            "status": "fail",
+            "bytes": 1348,
+            "sha256": "f2e6c12d512b68efab8cb21d44c54b643554a78897fb0490aa761edf516a1d29",
+            "summary": "No /Lang on the catalog. Tagged and titled otherwise.",
+            "expect": [
+                {
+                    "rule": "pdf.no_lang",
+                    "severity": "serious",
+                    "count": 1
+                }
+            ],
+            "expect_absent": [
+                "pdf.not_tagged",
+                "pdf.no_title",
+                "pdf.title_not_displayed"
+            ],
+            "notes": null
+        },
+        {
+            "path": "pdf/no-title.pdf",
+            "format": "pdf",
+            "status": "fail",
+            "bytes": 1405,
+            "sha256": "4ad91b8ae7173a3446881a8dcc1a287b24fa0047b049d0dc2b7be07032d68a7f",
+            "summary": "No /Info /Title and no XMP dc:title. /Info exists but only carries /Author.",
+            "expect": [
+                {
+                    "rule": "pdf.no_title",
+                    "severity": "serious",
+                    "count": 1
+                }
+            ],
+            "expect_absent": [
+                "pdf.not_tagged",
+                "pdf.no_lang",
+                "pdf.title_not_displayed"
+            ],
+            "notes": "A present-but-titleless /Info dictionary is the common case; do not treat \"has /Info\" as \"has a title\"."
+        },
+        {
+            "path": "pdf/no-tounicode.pdf",
+            "format": "pdf",
+            "status": "fail",
+            "bytes": 1965,
+            "sha256": "9ca5a2f547e661be465e6b7af8f0efd6b336c3811b895c2f179f87c31b1b0edb",
+            "summary": "A Type0/Identity-H subset font with no /ToUnicode CMap. The page shows text, but the glyph codes map to nothing.",
+            "expect": [
+                {
+                    "rule": "pdf.no_tounicode",
+                    "severity": "moderate",
+                    "count": 1
+                }
+            ],
+            "expect_absent": [
+                "pdf.image_only",
+                "pdf.not_tagged",
+                "pdf.no_title",
+                "pdf.no_lang",
+                "pdf.title_not_displayed"
+            ],
+            "notes": "A deliberate near-miss for pdf.image_only: text extraction yields nothing useful here, but there are no images, so the image-only rule must not fire. The font programme itself is not embedded — the fixture exercises the resource dictionary, not rendering."
+        },
+        {
+            "path": "pdf/tagged-good.pdf",
+            "format": "pdf",
+            "status": "pass",
+            "bytes": 2022,
+            "sha256": "fdb6ccaf544991fbd252749a0b63e97c53163cebd82a26e1a3d193320218b3d1",
+            "summary": "Tagged, titled in both /Info and XMP, /Lang set, DisplayDocTitle true, extractable text.",
+            "expect": [],
+            "expect_absent": [
+                "pdf.not_tagged",
+                "pdf.no_title",
+                "pdf.title_not_displayed",
+                "pdf.no_lang",
+                "pdf.image_only",
+                "pdf.extraction_blocked",
+                "pdf.no_bookmarks",
+                "pdf.unlabelled_form_fields",
+                "pdf.figure_missing_alt",
+                "pdf.no_tounicode"
+            ],
+            "notes": "The primary negative control. Uses Helvetica, one of the standard 14 fonts, so pdf.no_tounicode must exempt it rather than fire."
+        },
+        {
+            "path": "pdf/title-not-displayed.pdf",
+            "format": "pdf",
+            "status": "fail",
+            "bytes": 1323,
+            "sha256": "d0c060e977551fa4c9e22e33c6b355f5afb39be37b06e6ce5ab814e8865f8c34",
+            "summary": "Has a title, but no /ViewerPreferences at all, so DisplayDocTitle is absent.",
+            "expect": [
+                {
+                    "rule": "pdf.title_not_displayed",
+                    "severity": "serious",
+                    "count": 1
+                }
+            ],
+            "expect_absent": [
+                "pdf.no_title",
+                "pdf.not_tagged",
+                "pdf.no_lang"
+            ],
+            "notes": "A missing /ViewerPreferences dictionary and a present one with DisplayDocTitle false must both fail. This fixture covers the missing-dictionary case, which is by far the common one."
+        },
+        {
+            "path": "pdf/untagged.pdf",
+            "format": "pdf",
+            "status": "fail",
+            "bytes": 1193,
+            "sha256": "7f71f0eeab4198ea9200a4f160f2942b0994d04cb06770ced09e289a55eb75ea",
+            "summary": "No /StructTreeRoot and no /MarkInfo. Everything else is correct, so this isolates the tagging rule.",
+            "expect": [
+                {
+                    "rule": "pdf.not_tagged",
+                    "severity": "critical",
+                    "count": 1
+                }
+            ],
+            "expect_absent": [
+                "pdf.no_title",
+                "pdf.no_lang",
+                "pdf.title_not_displayed",
+                "pdf.no_bookmarks",
+                "pdf.image_only"
+            ],
+            "notes": "Also the negative control for pdf.no_bookmarks: two pages and no /Outlines must not fire the rule, which only applies over 20 pages."
+        },
+        {
+            "path": "pdf/xmp-title-only.pdf",
+            "format": "pdf",
+            "status": "pass",
+            "bytes": 1948,
+            "sha256": "c7ac63abdfab0778c9b69096d466a0c6cc07aab7f3224ddb52bd0eca9b2cd091",
+            "summary": "No /Info /Title, but dc:title is present in the XMP packet.",
+            "expect": [],
+            "expect_absent": [
+                "pdf.no_title",
+                "pdf.not_tagged",
+                "pdf.no_lang",
+                "pdf.title_not_displayed"
+            ],
+            "notes": "Tests the \"and\" in the rule: the title check fails only when both /Info /Title and XMP dc:title are missing."
+        },
+        {
+            "path": "pptx/alt-text-not-descriptive.pptx",
+            "format": "pptx",
+            "status": "fail",
+            "bytes": 6203,
+            "sha256": "ffb3b2cd6eeb0b50e2ec56f82a4414b02118a612031babfdd8604fec40fd61eb",
+            "summary": "Three objects, all with alt text: one describes the picture, one is a filename, one is the shape's own name.",
+            "expect": [
+                {
+                    "rule": "pptx.alt_text_is_filename",
+                    "severity": "critical",
+                    "count": 1
+                },
+                {
+                    "rule": "pptx.alt_text_not_descriptive",
+                    "severity": "critical",
+                    "count": 1
+                }
+            ],
+            "expect_absent": [
+                "pptx.shape_missing_alt",
+                "pptx.slide_missing_title",
+                "pptx.reading_order"
+            ],
+            "notes": "Every object here has alt text, so a rule that only checks presence reports a clean slide. The third case is alt text copied from the object's own name, which no list of generic words could catch — it is found by comparing the two."
+        },
+        {
+            "path": "pptx/default-section-names.pptx",
+            "format": "pptx",
+            "status": "fail",
+            "bytes": 8719,
+            "sha256": "82200256deeff586011371cafd26ed8c5933feb5d96080960d1dbb050189e984",
+            "summary": "Four sections: two left at PowerPoint's default name, two sharing a name, one named properly.",
+            "expect": [
+                {
+                    "rule": "pptx.default_section_names",
+                    "severity": "minor",
+                    "count": 3
+                }
+            ],
+            "expect_absent": [
+                "pptx.slide_missing_title",
+                "pptx.duplicate_slide_titles",
+                "pptx.shape_missing_alt"
+            ],
+            "notes": "Sections live in a p14 extension on the presentation part, not in the presentation schema proper. Three findings: the two \"Untitled Section\" entries and the second \"Estates\". The slide titles are all distinct, so a rule that confused sections with slides would be visible."
+        },
+        {
+            "path": "pptx/duplicate-slide-titles.pptx",
+            "format": "pptx",
+            "status": "fail",
+            "bytes": 8575,
+            "sha256": "fd9c3731e1289ee71225f897c7cccee945ea9892d12732c4aacf045bfd7bb16e",
+            "summary": "Four slides. Three share the title \"Results\"; the fourth is distinct.",
+            "expect": [
+                {
+                    "rule": "pptx.duplicate_slide_titles",
+                    "severity": "minor",
+                    "count": 1
+                }
+            ],
+            "expect_absent": [
+                "pptx.slide_missing_title",
+                "pptx.shape_missing_alt"
+            ],
+            "notes": "Microsoft treats this as a tip, which maps to minor. One finding for the duplicate group rather than one per slide; the fixture uses three duplicates so a per-slide implementation is visibly wrong."
+        },
+        {
+            "path": "pptx/good.pptx",
+            "format": "pptx",
+            "status": "pass",
+            "bytes": 8152,
+            "sha256": "527e87e9130207eee3b3cafbd510d1224cfe2f76a082d403a31b51cc24aa5f34",
+            "summary": "Three slides, each with a distinct non-empty title placeholder, and every picture described.",
+            "expect": [],
+            "expect_absent": [
+                "pptx.slide_missing_title",
+                "pptx.duplicate_slide_titles",
+                "pptx.shape_missing_alt"
+            ],
+            "notes": "The primary negative control for PowerPoint."
+        },
+        {
+            "path": "pptx/media-without-captions.pptx",
+            "format": "pptx",
+            "status": "fail",
+            "bytes": 7600,
+            "sha256": "1534faa0e31f1d2e62f69f08595b012c6a471006ae24f5f1efe969bf9580f505",
+            "summary": "Two slides each embedding a video. Slide 1 carries a caption relationship; slide 2 carries none.",
+            "expect": [
+                {
+                    "rule": "pptx.media_without_captions",
+                    "severity": "moderate",
+                    "count": 1
+                }
+            ],
+            "expect_absent": [
+                "pptx.slide_missing_title",
+                "pptx.shape_missing_alt",
+                "pptx.duplicate_slide_titles"
+            ],
+            "notes": "The caption relationship type here is the Microsoft 2016 extension, written from documentation rather than captured from a real captioned deck — so the negative control tests our own assumption. The finding is worded as \"captions could not be found\", which stays true either way, rather than as an assertion that the video is uncaptioned."
+        },
+        {
+            "path": "pptx/reading-order.pptx",
+            "format": "pptx",
+            "status": "fail",
+            "bytes": 6701,
+            "sha256": "84fcc796b0221c2a4d9a0324f70638a3efde01f7cf9464bdde6197bdbf5946b0",
+            "summary": "Slide 2 lists its body text before its title in p:spTree while the title is positioned above it.",
+            "expect": [
+                {
+                    "rule": "pptx.reading_order",
+                    "severity": "minor",
+                    "count": 1
+                }
+            ],
+            "expect_absent": [
+                "pptx.slide_missing_title",
+                "pptx.duplicate_slide_titles",
+                "pptx.shape_missing_alt"
+            ],
+            "notes": "Spec §12 warns this rule produces false positives on decorative layouts, so it ships as a tip rather than a warning and only fires when one shape sits entirely above another it follows in the tree. Slide 1 is the negative control: same two shapes, correct order."
+        },
+        {
+            "path": "pptx/shape-missing-alt.pptx",
+            "format": "pptx",
+            "status": "fail",
+            "bytes": 7326,
+            "sha256": "da1a9b14b4b73e7f594a33d6a05cb5ab048b60ce1c7f85fe53bc70b3a1382a55",
+            "summary": "Slide 1 describes both its picture and its drawn shape. Slide 2 describes neither.",
+            "expect": [
+                {
+                    "rule": "pptx.shape_missing_alt",
+                    "severity": "critical",
+                    "count": 2
+                }
+            ],
+            "expect_absent": [
+                "pptx.slide_missing_title",
+                "pptx.duplicate_slide_titles"
+            ],
+            "notes": "Covers both p:pic and p:sp: alt text lives on p:cNvPr/@descr for both, and a rule that only walks pictures will miss half of a real deck."
+        },
+        {
+            "path": "pptx/slide-missing-title.pptx",
+            "format": "pptx",
+            "status": "fail",
+            "bytes": 7596,
+            "sha256": "e6a68fd4a60ea77794fa7493c05ae1edb757a837eafd0b9219dce86660fda42c",
+            "summary": "Three slides: titled, no title placeholder, empty title placeholder.",
+            "expect": [
+                {
+                    "rule": "pptx.slide_missing_title",
+                    "severity": "critical",
+                    "count": 2
+                }
+            ],
+            "expect_absent": [
+                "pptx.duplicate_slide_titles",
+                "pptx.shape_missing_alt"
+            ],
+            "notes": "An empty title placeholder is as bad as a missing one, and it is the more common authoring mistake. Findings must be located to slides 2 and 3."
+        },
+        {
+            "path": "xlsx/alt-text-not-descriptive.xlsx",
+            "format": "xlsx",
+            "status": "fail",
+            "bytes": 4563,
+            "sha256": "040b08e7c509de2ce430f3a29c96fd69993d31d32eef88d9ed9e7f41eefcf5f1",
+            "summary": "Three drawings, all with alt text: one describes the chart, one is a filename, one is the object's own name.",
+            "expect": [
+                {
+                    "rule": "xlsx.alt_text_is_filename",
+                    "severity": "critical",
+                    "count": 1
+                },
+                {
+                    "rule": "xlsx.alt_text_not_descriptive",
+                    "severity": "critical",
+                    "count": 1
+                }
+            ],
+            "expect_absent": [
+                "xlsx.drawing_missing_alt",
+                "xlsx.default_sheet_name",
+                "xlsx.blank_sheet"
+            ],
+            "notes": "The pair to xlsx/drawing-missing-alt.xlsx: there every drawing is missing a description, here every drawing has one and two of them are worthless. A workbook can pass the presence check and fail a reader completely."
+        },
+        {
+            "path": "xlsx/default-sheet-names.xlsx",
+            "format": "xlsx",
+            "status": "fail",
+            "bytes": 3672,
+            "sha256": "929b698a587173f29e389045dbe5c6b0a167bf3fc255e8a71f69bce03cb600e0",
+            "summary": "Three sheets: \"Sheet1\" with data, \"Sheet2\" with nothing in it, and a properly named third sheet.",
+            "expect": [
+                {
+                    "rule": "xlsx.default_sheet_name",
+                    "severity": "moderate",
+                    "count": 2
+                },
+                {
+                    "rule": "xlsx.blank_sheet",
+                    "severity": "moderate",
+                    "count": 1
+                }
+            ],
+            "expect_absent": [
+                "xlsx.table_missing_header_row",
+                "xlsx.drawing_missing_alt"
+            ],
+            "notes": "Sheet2 is both default-named and blank, so it produces one finding under each rule. The named third sheet must produce neither."
+        },
+        {
+            "path": "xlsx/drawing-missing-alt.xlsx",
+            "format": "xlsx",
+            "status": "fail",
+            "bytes": 4536,
+            "sha256": "24fdc2c970a7a385fd2753304f47756499b941dfc99b0a5b6d5c7f86326bca0c",
+            "summary": "One sheet with three drawings: described, descr=\"\", and no descr attribute.",
+            "expect": [
+                {
+                    "rule": "xlsx.drawing_missing_alt",
+                    "severity": "critical",
+                    "count": 2
+                }
+            ],
+            "expect_absent": [
+                "xlsx.default_sheet_name",
+                "xlsx.blank_sheet",
+                "xlsx.table_missing_header_row"
+            ],
+            "notes": "Excel keeps drawings in a separate part reached through the worksheet relationships, so this fixture only passes once part resolution works. Critical, matching the Word and PowerPoint versions of the same rule and Microsoft, which covers all three applications with one rule — spec §6 lists this one as serious, which reads as an oversight beside its own grading of the other two."
+        },
+        {
+            "path": "xlsx/good.xlsx",
+            "format": "xlsx",
+            "status": "pass",
+            "bytes": 5368,
+            "sha256": "3317a9e7094b3814ba7f50bc7eba0c41cf6c6a5daec56f5c52250d8e3baccc26",
+            "summary": "Named sheets, a table with a header row, and a described chart image.",
+            "expect": [],
+            "expect_absent": [
+                "xlsx.default_sheet_name",
+                "xlsx.blank_sheet",
+                "xlsx.table_missing_header_row",
+                "xlsx.drawing_missing_alt",
+                "xlsx.red_only_conditional_formatting"
+            ],
+            "notes": "The primary negative control for Excel."
+        },
+        {
+            "path": "xlsx/red-only-formatting.xlsx",
+            "format": "xlsx",
+            "status": "fail",
+            "bytes": 3073,
+            "sha256": "88aca535f71f85d9490a519593038ab14a56b8a4a0f2718e33285f58990646f8",
+            "summary": "A cellIs/lessThan conditional format whose dxf changes only the font colour to red.",
+            "expect": [
+                {
+                    "rule": "xlsx.red_only_conditional_formatting",
+                    "severity": "moderate",
+                    "count": 1
+                }
+            ],
+            "expect_absent": [
+                "xlsx.default_sheet_name",
+                "xlsx.blank_sheet",
+                "xlsx.drawing_missing_alt"
+            ],
+            "notes": "Colour carrying meaning on its own. The dxf sets a font colour and nothing else — no fill, no bold, no number format — which is what makes it a failure rather than a decoration."
+        },
+        {
+            "path": "xlsx/table-missing-header.xlsx",
+            "format": "xlsx",
+            "status": "fail",
+            "bytes": 4876,
+            "sha256": "02939372139922b05d6f3f334c5bcfc9088871fb787789f18cee338cec075d9a",
+            "summary": "Two tables. The first declares headerRowCount=\"1\"; the second declares headerRowCount=\"0\".",
+            "expect": [
+                {
+                    "rule": "xlsx.table_missing_header_row",
+                    "severity": "serious",
+                    "count": 1
+                }
+            ],
+            "expect_absent": [
+                "xlsx.default_sheet_name",
+                "xlsx.blank_sheet",
+                "xlsx.drawing_missing_alt"
+            ],
+            "notes": "The header row exists visually in both — row 1 holds the labels either way. Only the declaration differs, which is the whole point: the rule has to read the table part, not the cell values."
+        }
+    ]
+}

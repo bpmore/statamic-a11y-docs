@@ -1,0 +1,231 @@
+{
+  "report": {
+    "buildInformation": {
+      "releaseDetails": [
+        {
+          "id": "core",
+          "version": "1.30.2",
+          "buildDate": 1780501320000
+        },
+        {
+          "id": "validation-model",
+          "version": "1.30.2",
+          "buildDate": 1780501560000
+        },
+        {
+          "id": "apps",
+          "version": "1.30.0",
+          "buildDate": 1780512420000
+        }
+      ]
+    },
+    "jobs": [
+      {
+        "itemDetails": {
+          "name": "/fixtures/form-unlabelled-fields.pdf",
+          "size": 2231
+        },
+        "validationResult": [
+          {
+            "details": {
+              "passedRules": 101,
+              "failedRules": 5,
+              "passedChecks": 132,
+              "failedChecks": 8,
+              "tags": [
+                "annotation",
+                "metadata",
+                "alt-text",
+                "page",
+                "font"
+              ],
+              "ruleSummaries": [
+                {
+                  "ruleStatus": "FAILED",
+                  "specification": "ISO 14289-1:2014",
+                  "clause": "7.18.4",
+                  "testNumber": 1,
+                  "status": "failed",
+                  "failedChecks": 3,
+                  "tags": [
+                    "annotation"
+                  ],
+                  "description": "A Widget annotation shall be nested within a Form tag per ISO 32000-1:2008, 14.8.4.5, Table 340",
+                  "object": "PDWidgetAnnot",
+                  "test": "structParentStandardType == 'Form' || isOutsideCropBox == true || (F & 2) == 2",
+                  "checks": [
+                    {
+                      "status": "failed",
+                      "context": "root/document[0]/pages[0](5 0 obj PDPage)/annots[0](10 0 obj PDWidgetAnnot)",
+                      "errorMessage": "A Widget annotation is an Artifact or is nested within null tag (standard type = null) instead of Form",
+                      "errorArguments": [
+                        null,
+                        null
+                      ]
+                    },
+                    {
+                      "status": "failed",
+                      "context": "root/document[0]/pages[0](5 0 obj PDPage)/annots[1](11 0 obj PDWidgetAnnot)",
+                      "errorMessage": "A Widget annotation is an Artifact or is nested within null tag (standard type = null) instead of Form",
+                      "errorArguments": [
+                        null,
+                        null
+                      ]
+                    },
+                    {
+                      "status": "failed",
+                      "context": "root/document[0]/pages[0](5 0 obj PDPage)/annots[2](12 0 obj PDWidgetAnnot)",
+                      "errorMessage": "A Widget annotation is an Artifact or is nested within null tag (standard type = null) instead of Form",
+                      "errorArguments": [
+                        null,
+                        null
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "ruleStatus": "FAILED",
+                  "specification": "ISO 14289-1:2014",
+                  "clause": "7.21.4.1",
+                  "testNumber": 1,
+                  "status": "failed",
+                  "failedChecks": 1,
+                  "tags": [
+                    "font"
+                  ],
+                  "description": "The font programs for all fonts used for rendering within a conforming file shall be embedded within that file, as defined in ISO 32000-1:2008, 9.9",
+                  "object": "PDFont",
+                  "test": "Subtype == \"Type3\" || Subtype == \"Type0\" || renderingMode == 3 || containsFontFile == true",
+                  "checks": [
+                    {
+                      "status": "failed",
+                      "context": "root/document[0]/pages[0](5 0 obj PDPage)/contentStream[0](13 0 obj PDSemanticContentStream)/operators[4]/font[0](Helvetica)",
+                      "errorMessage": "The font program is not embedded",
+                      "errorArguments": []
+                    }
+                  ]
+                },
+                {
+                  "ruleStatus": "FAILED",
+                  "specification": "ISO 14289-1:2014",
+                  "clause": "7.18.3",
+                  "testNumber": 1,
+                  "status": "failed",
+                  "failedChecks": 1,
+                  "tags": [
+                    "page"
+                  ],
+                  "description": "Every page on which there is an annotation shall contain in its page dictionary the key Tabs, and its value shall be S",
+                  "object": "PDPage",
+                  "test": "containsAnnotations == false || Tabs == 'S'",
+                  "checks": [
+                    {
+                      "status": "failed",
+                      "context": "root/document[0]/pages[0](5 0 obj PDPage)",
+                      "errorMessage": "A page with annotation(s) contains Tabs key with value null instead of S",
+                      "errorArguments": [
+                        null
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "ruleStatus": "FAILED",
+                  "specification": "ISO 14289-1:2014",
+                  "clause": "7.1",
+                  "testNumber": 8,
+                  "status": "failed",
+                  "failedChecks": 1,
+                  "tags": [
+                    "metadata"
+                  ],
+                  "description": "The Catalog dictionary of a conforming file shall contain the Metadata key whose value is a metadata stream as defined in ISO 32000-1:2008, 14.3.2. The metadata stream dictionary shall contain entry Type with value /Metadata and entry Subtype with value /XML",
+                  "object": "PDDocument",
+                  "test": "containsMetadata == true",
+                  "checks": [
+                    {
+                      "status": "failed",
+                      "context": "root/document[0]",
+                      "errorMessage": "The document catalog dictionary doesn't contain metadata key or metadata stream dictionary does not contain either entry Type with value /Metadata or entry Subtype with value /XML",
+                      "errorArguments": []
+                    }
+                  ]
+                },
+                {
+                  "ruleStatus": "FAILED",
+                  "specification": "ISO 14289-1:2014",
+                  "clause": "7.18.1",
+                  "testNumber": 3,
+                  "status": "failed",
+                  "failedChecks": 2,
+                  "tags": [
+                    "annotation",
+                    "alt-text"
+                  ],
+                  "description": "A form field shall have a TU key present or all its Widget annotations shall have alternative descriptions (in the form of an Alt entry in the enclosing structure elements)",
+                  "object": "PDWidgetAnnot",
+                  "test": "isOutsideCropBox == true || (F & 2) == 2 || (TU != null && TU != '') || (Alt != null && Alt != '')",
+                  "checks": [
+                    {
+                      "status": "failed",
+                      "context": "root/document[0]/pages[0](5 0 obj PDPage)/annots[1](11 0 obj PDWidgetAnnot)",
+                      "errorMessage": "A form field neither has TU key nor its Widget annotations have alternative descriptions (in the form of an Alt entry in the enclosing structure element)",
+                      "errorArguments": []
+                    },
+                    {
+                      "status": "failed",
+                      "context": "root/document[0]/pages[0](5 0 obj PDPage)/annots[2](12 0 obj PDWidgetAnnot)",
+                      "errorMessage": "A form field neither has TU key nor its Widget annotations have alternative descriptions (in the form of an Alt entry in the enclosing structure element)",
+                      "errorArguments": []
+                    }
+                  ]
+                }
+              ]
+            },
+            "jobEndStatus": "normal",
+            "profileName": "PDF/UA-1 validation profile",
+            "statement": "PDF file is not compliant with Validation Profile requirements.",
+            "compliant": false
+          }
+        ],
+        "processingTime": {
+          "start": 1788891361621,
+          "finish": 1788891361761,
+          "difference": 140,
+          "duration": "00:00:00.140"
+        }
+      }
+    ],
+    "batchSummary": {
+      "duration": {
+        "start": 1788891361595,
+        "finish": 1788891361775,
+        "difference": 180,
+        "duration": "00:00:00.180"
+      },
+      "totalJobs": 1,
+      "outOfMemory": 0,
+      "veraExceptions": 0,
+      "featuresSummary": {
+        "failedJobCount": 0,
+        "totalJobCount": 0,
+        "successfulJobCount": 0
+      },
+      "repairSummary": {
+        "failedJobCount": 0,
+        "totalJobCount": 0,
+        "successfulJobCount": 0
+      },
+      "multiJob": false,
+      "failedEncryptedJobs": 0,
+      "failedParsingJobs": 0,
+      "validationSummary": {
+        "failedJobCount": 0,
+        "totalJobCount": 1,
+        "nonCompliantPdfaCount": 1,
+        "compliantPdfaCount": 0,
+        "successfulJobCount": 1
+      }
+    }
+  }
+}

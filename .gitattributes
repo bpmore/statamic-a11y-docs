@@ -1,0 +1,11 @@
+# The fixture corpus is generated binary content. Never let git rewrite a byte of it:
+# a normalised line ending inside a ZIP or a PDF xref table is a corrupt fixture.
+tests/fixtures/documents/** binary
+
+# The two files in there that are meant to be read as text.
+tests/fixtures/documents/manifest.json text diff merge
+tests/fixtures/documents/README.md text diff merge
+
+# The package's own binary test fixtures. Same reasoning: a normalised line
+# ending inside a ZIP is a corrupt fixture.
+tests/fixtures/ooxml/** binary

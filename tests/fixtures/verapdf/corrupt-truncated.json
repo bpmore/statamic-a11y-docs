@@ -1,0 +1,81 @@
+{
+  "report": {
+    "buildInformation": {
+      "releaseDetails": [
+        {
+          "id": "core",
+          "version": "1.30.2",
+          "buildDate": 1780501320000
+        },
+        {
+          "id": "validation-model",
+          "version": "1.30.2",
+          "buildDate": 1780501560000
+        },
+        {
+          "id": "apps",
+          "version": "1.30.0",
+          "buildDate": 1780512420000
+        }
+      ]
+    },
+    "jobs": [
+      {
+        "itemDetails": {
+          "name": "/fixtures/corrupt-truncated.pdf",
+          "size": 263
+        },
+        "taskException": {
+          "exception": "Couldn't parse stream",
+          "type": "PARSE",
+          "duration": {
+            "start": 1788891359442,
+            "finish": 1788891359459,
+            "difference": 17,
+            "duration": "00:00:00.017"
+          },
+          "exceptionMessage": "Exception: Couldn't parse stream caused by exception: Document doesn't contain startxref keyword",
+          "executed": true,
+          "success": false
+        },
+        "processingTime": {
+          "start": 1788891359442,
+          "finish": 1788891359459,
+          "difference": 17,
+          "duration": "00:00:00.017"
+        }
+      }
+    ],
+    "batchSummary": {
+      "duration": {
+        "start": 1788891359426,
+        "finish": 1788891359465,
+        "difference": 39,
+        "duration": "00:00:00.039"
+      },
+      "totalJobs": 1,
+      "outOfMemory": 0,
+      "veraExceptions": 0,
+      "failedEncryptedJobs": 0,
+      "failedParsingJobs": 1,
+      "validationSummary": {
+        "nonCompliantPdfaCount": 0,
+        "compliantPdfaCount": 0,
+        "failedJobCount": 1,
+        "totalJobCount": 1,
+        "successfulJobCount": 0
+      },
+      "featuresSummary": {
+        "failedJobCount": 0,
+        "totalJobCount": 0,
+        "successfulJobCount": 0
+      },
+      "repairSummary": {
+        "failedJobCount": 0,
+        "totalJobCount": 0,
+        "successfulJobCount": 0
+      },
+      "multiJob": false
+    }
+  }
+}

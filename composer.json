@@ -1,0 +1,69 @@
+{
+    "name": "bpmore/statamic-a11y-docs",
+    "description": "Document accessibility checking for the Statamic asset library: PDF, Word, PowerPoint and Excel.",
+    "type": "statamic-addon",
+    "license": "proprietary",
+    "keywords": [
+        "statamic",
+        "accessibility",
+        "a11y",
+        "pdf",
+        "wcag",
+        "pdf-ua"
+    ],
+    "authors": [
+        {
+            "name": "Brent Passmore"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "ext-dom": "*",
+        "ext-zip": "*",
+        "smalot/pdfparser": "^2.12",
+        "statamic/cms": "^6.0",
+        "symfony/process": "^7.0 || ^8.0"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.18",
+        "orchestra/testbench": "^10.8 || ^11.0",
+        "pestphp/pest": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Bpmore\\DocumentA11yCore\\": "core/",
+            "Bpmore\\StatamicA11yDocs\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Bpmore\\StatamicA11yDocs\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "statamic": {
+            "name": "A11y Docs",
+            "slug": "a11y-docs",
+            "description": "Finds the documents in your asset library that nobody can read."
+        },
+        "laravel": {
+            "providers": [
+                "Bpmore\\StatamicA11yDocs\\ServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "pixelfear/composer-dist-plugin": true,
+            "php-http/discovery": true
+        },
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "scripts": {
+        "test": "pest",
+        "lint": "pint"
+    }
+}
