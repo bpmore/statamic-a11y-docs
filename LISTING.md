@@ -20,7 +20,7 @@ tell anyone this handles PDFs.
 
 ## Price
 
-$149 per site.
+$99 per site.
 
 ## One-liner
 
