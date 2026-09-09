@@ -55,6 +55,7 @@ class ServiceProvider extends AddonServiceProvider
 
     protected $commands = [
         Commands\CheckDocuments::class,
+        Commands\InstallDocuments::class,
         Commands\PruneDocuments::class,
         Commands\ReportDocuments::class,
     ];
@@ -64,10 +65,15 @@ class ServiceProvider extends AddonServiceProvider
         $this->bootPermissions();
         $this->bootNavigation();
 
-        // Loaded rather than published, so `php please migrate` picks them up
-        // on install without a step somebody has to remember. Publishable too,
-        // for a site that needs to change them.
-        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        // The addon's own SQLite connection, unless the site named one of its
+        // own. Defined here rather than in register() because it reads the
+        // merged config.
+        $this->app->make(Storage\DocumentDatabase::class)->defineDefaultConnection();
+
+        // Deliberately not loadMigrationsFrom: that would run these against the
+        // app's default connection under `php please migrate` while
+        // `docs:install` runs them against the configured one, and the two
+        // would keep separate records of what has run. One path, one record.
 
         $this->publishes([
             __DIR__.'/../database/migrations' => database_path('migrations'),

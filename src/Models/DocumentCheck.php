@@ -7,6 +7,7 @@ namespace Bpmore\StatamicA11yDocs\Models;
 use Bpmore\DocumentA11yCore\Format;
 use Bpmore\DocumentA11yCore\Severity;
 use Bpmore\DocumentA11yCore\Status;
+use Bpmore\StatamicA11yDocs\Storage\DocumentDatabase;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -24,6 +25,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class DocumentCheck extends Model
 {
     protected $table = 'document_checks';
+
+    /**
+     * Read at call time, not set as a property: the connection is configurable
+     * and a property would freeze whatever it was when the class was loaded.
+     */
+    public function getConnectionName(): string
+    {
+        return DocumentDatabase::connectionName();
+    }
 
     protected $guarded = [];
 

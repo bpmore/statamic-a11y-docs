@@ -149,4 +149,19 @@ return [
 
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Where the results are kept
+    |--------------------------------------------------------------------------
+    |
+    | Null means the addon's own SQLite file under storage/a11y-docs/, created
+    | on install. Most Statamic sites are flat-file and have no database, and
+    | requiring one to try an addon is a reason not to try it.
+    |
+    | Name one of the site's own connections to put the tables there instead.
+    |
+    */
+
+    'connection' => env('A11Y_DOCS_CONNECTION'),
+
 ];

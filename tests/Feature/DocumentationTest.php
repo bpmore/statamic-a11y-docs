@@ -65,7 +65,7 @@ it('keeps the repository name out of anything a customer reads', function () {
 
     expect(strtolower($listing))->not->toContain('docugate ')
         ->and($listing)->toContain('A11y Docs')
-        ->and($listing)->toContain('$149');
+        ->and($listing)->toContain('$99');
 });
 
 it('links every documentation page from the README', function () {

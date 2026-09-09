@@ -35,7 +35,7 @@ different job.
 
 ```
 composer require bpmore/statamic-a11y-docs
-php please migrate
+php please docs:install
 php please docs:check
 ```
 

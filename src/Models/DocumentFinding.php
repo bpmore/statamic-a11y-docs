@@ -6,6 +6,7 @@ namespace Bpmore\StatamicA11yDocs\Models;
 
 use Bpmore\DocumentA11yCore\Location;
 use Bpmore\DocumentA11yCore\Severity;
+use Bpmore\StatamicA11yDocs\Storage\DocumentDatabase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -22,6 +23,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class DocumentFinding extends Model
 {
     protected $table = 'document_findings';
+
+    /**
+     * Read at call time, not set as a property: the connection is configurable
+     * and a property would freeze whatever it was when the class was loaded.
+     */
+    public function getConnectionName(): string
+    {
+        return DocumentDatabase::connectionName();
+    }
 
     public $timestamps = false;
 

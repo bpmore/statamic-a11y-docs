@@ -6,13 +6,16 @@ It inventories and triages. It does not remediate.
 
 ## Installing
 
-Require the package, run the migrations, and take a first look:
+Require the package, create the tables, and take a first look:
 
 - `composer require bpmore/statamic-a11y-docs`
-- `php please migrate`
+- `php please docs:install`
+- `php please vendor:publish --tag=a11y-docs`
 - `php please docs:check`
 
-Three tables are created - `document_checks`, `document_findings` and `document_exemptions`. The first scan reads every document in every asset container. Subsequent scans read only what changed, because the check is a hash comparison.
+`docs:install` creates three tables: `document_checks`, `document_findings` and `document_exemptions`. By default they go in a SQLite file the addon creates for itself under `storage/a11y-docs/`, so a flat-file site needs nothing else. To put them in a database the site already runs, set `A11Y_DOCS_CONNECTION` to one of its connection names, or set `connection` in the config, and run the command again.
+
+The first scan reads every document in every asset container. Subsequent scans read only what changed, because the check is a hash comparison.
 
 ## Configuration
 

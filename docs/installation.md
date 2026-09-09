@@ -2,13 +2,31 @@
 
 ```
 composer require bpmore/statamic-a11y-docs
-php please migrate
+php please docs:install
+php please vendor:publish --tag=a11y-docs
 php please docs:check
 ```
 
-Three tables are created: `document_checks`, `document_findings` and
-`document_exemptions`. The first scan reads every document in every asset
-container; subsequent scans read only what changed.
+`docs:install` creates three tables: `document_checks`, `document_findings` and
+`document_exemptions`. By default they go in a SQLite file the addon creates for
+itself under `storage/a11y-docs/`, so a flat-file site needs nothing else — most
+Statamic sites have no database, and requiring one to try an addon is a reason
+not to try it.
+
+To keep them in a database the site already runs, name one of its connections:
+
+```
+A11Y_DOCS_CONNECTION=mysql
+```
+
+The command asks before creating tables on a connection the site administers.
+`--force` skips the question for scripted installs.
+
+`vendor:publish` copies the control panel assets. Without it the CP reports
+"Vite manifest not found".
+
+The first scan reads every document in every asset container; subsequent scans
+read only what changed.
 
 ## Configuration
 
