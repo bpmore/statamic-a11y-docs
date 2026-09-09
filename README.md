@@ -3,9 +3,10 @@
 **Document accessibility checking for the Statamic asset library.** PDF, Word,
 PowerPoint and Excel.
 
-Every university, hospital and agency has thousands of PDFs nobody has ever
-looked at. It is the first thing an external auditor counts, because it is the
-easiest thing to count. This tells you what is in there.
+Every university, hospital and agency has thousands of PDFs and Office documents
+in its asset library, and no record of which of them are accessible. It is the
+first thing an external auditor counts, because it is the easiest thing to
+count. This tells you what is in there.
 
 ```
 php please docs:check

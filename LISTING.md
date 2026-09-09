@@ -40,10 +40,10 @@ that this cannot judge a document accessible, only report problems it finds.
 
 ## Long description
 
-Every university, hospital and agency has thousands of PDFs nobody has ever
-looked at. They are the largest accessibility liability on most sites, and the
-first thing an external auditor counts — because they are the easiest thing to
-count.
+Every university, hospital and agency has thousands of PDFs and Office documents
+in its asset library, and no record of which of them are accessible. They are
+the largest accessibility liability on most sites, and the first thing an
+external auditor counts — because they are the easiest thing to count.
 
 A11y Docs inventories them.
 
