@@ -78,8 +78,7 @@ actually wrong.
 
 **It inventories and triages. It does not remediate.** Knowing you have 890
 untagged PDFs and exactly which ones is the hard part. Fixing them is a
-different job, and any tool claiming to do it automatically is worth a
-suspicious look.
+separate job, done in Acrobat or in the tool the document was written in.
 
 ## Features list
 
