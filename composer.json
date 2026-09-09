@@ -7,7 +7,6 @@
         "accessibility",
         "a11y",
         "pdf",
-        "wcag",
         "pdf-ua"
     ],
     "homepage": "https://github.com/bpmore/statamic-a11y-docs",

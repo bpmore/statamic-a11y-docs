@@ -105,4 +105,4 @@ All three should surface on a marketplace search for "a11y" or "accessibility".
 
 ## Keywords
 
-accessibility, a11y, wcag, pdf, pdf/ua, section 508, documents, assets, audit
+accessibility, a11y, pdf, pdf/ua, section 508, documents, assets, audit
