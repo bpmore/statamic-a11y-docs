@@ -87,4 +87,7 @@ are both optional and both degrade to a clear message rather than a failure.
 
 ## Licence
 
-Proprietary. One licence per site.
+Proprietary. One licence per production site; local development and CI are free.
+The source is published so it can be installed with Composer and inspected by
+the people who rely on it. See [LICENCE](LICENSE.md) — in particular what it
+says about the difference between a heuristic finding and PDF/UA validation.
