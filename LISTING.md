@@ -24,7 +24,7 @@ $99 per site.
 
 ## One-liner
 
-Find the documents in your asset library that nobody can read.
+Find the documents in your asset library with accessibility problems.
 
 ## Summary (marketplace card)
 
@@ -52,9 +52,9 @@ A11y Docs inventories them.
 ```
 
 **36 checks across four formats.** PDFs that have no tags at all, scans that are
-pictures of words, documents with no title or language, figures nobody
-described, forms with unlabelled fields, encryption that locks out a screen
-reader. Word, PowerPoint and Excel rules are grounded in Microsoft's own
+pictures of words, documents with no title or language, figures with no
+alternative text, forms with unlabelled fields, encryption that locks out a
+screen reader. Word, PowerPoint and Excel rules are grounded in Microsoft's own
 Accessibility Checker, so a finding matches something the author can see and fix
 in the tool they wrote it in.
 
@@ -65,20 +65,19 @@ well as read it.
 
 **Installing it does not break your site.** The backlog you already have is
 reported but never blocks publishing. Only new documents are gated, only on
-critical problems, and anything can be exempted with a reason. This is the
-decision the product lives or dies on and it ships the safe way round.
+critical problems, and anything can be exempted with a reason. Installing this
+changes nothing about what you can publish today.
 
 **It re-checks only what changed.** A library of 1,240 documents is not
 reprocessed nightly.
 
 **Reports say what they are.** Every result records which engine produced it, so
 nothing claims formal PDF/UA validation it did not perform. The exported report
-is itself a tagged PDF that passes PDF/UA validation — which, for a report about
-document accessibility, seemed like the least it could do.
+is itself a tagged PDF that passes PDF/UA validation.
 
 Optional: install veraPDF for authoritative PDF/UA-1 validation. **Most sites
-should not.** The built-in checks need nothing installed and find what is
-actually wrong.
+should not.** The built-in checks need nothing installed and find the problems
+that are actually in your library.
 
 ### What it does not do
 
