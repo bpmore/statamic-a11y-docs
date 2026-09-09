@@ -2,7 +2,6 @@
     "name": "bpmore/statamic-a11y-docs",
     "description": "Document accessibility checking for the Statamic asset library: PDF, Word, PowerPoint and Excel.",
     "type": "statamic-addon",
-    "license": "proprietary",
     "keywords": [
         "statamic",
         "accessibility",
@@ -11,6 +10,13 @@
         "wcag",
         "pdf-ua"
     ],
+    "homepage": "https://github.com/bpmore/statamic-a11y-docs",
+    "license": "proprietary",
+    "support": {
+        "issues": "https://github.com/bpmore/statamic-a11y-docs/issues",
+        "source": "https://github.com/bpmore/statamic-a11y-docs",
+        "docs": "https://github.com/bpmore/statamic-a11y-docs/blob/main/README.md"
+    },
     "authors": [
         {
             "name": "Brent Passmore"
