@@ -18,6 +18,7 @@ use Bpmore\StatamicA11yDocs\Gate\DocumentReferences;
 use Bpmore\StatamicA11yDocs\Gate\PublishGate;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Route;
 use Statamic\Events\EntrySaving;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Permission;
@@ -109,6 +110,17 @@ class ServiceProvider extends AddonServiceProvider
     private function bootNavigation(): void
     {
         Nav::extend(function ($nav): void {
+            // A cached route table built before this addon was installed does
+            // not contain its CP routes, and Nav::extend runs on every control
+            // panel request including the login page. Without this guard a
+            // stale cache takes the whole control panel down with
+            // "Route [statamic.cp.a11y-docs.dashboard] not defined" - the
+            // addon's own absence breaking pages that have nothing to do with
+            // it. Measured on a Forge deploy.
+            if (! Route::has('statamic.cp.a11y-docs.dashboard')) {
+                return;
+            }
+
             // No ->active() here: Statamic 5 took an explicit pattern, Statamic 6
             // removed the method and works the active state out from the URL
             // itself. Calling it is a fatal error that takes down the whole

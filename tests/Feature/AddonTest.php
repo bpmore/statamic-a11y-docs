@@ -9,6 +9,8 @@ use Bpmore\DocumentA11yCore\Pdf\PdfInspector;
 use Bpmore\DocumentA11yCore\Status;
 use Bpmore\StatamicA11yDocs\ServiceProvider;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Routing\RouteCollection;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Statamic\CP\Navigation\Nav as StatamicNav;
 use Statamic\Facades\Addon;
@@ -250,4 +252,43 @@ it('gives every badge a colour Statamic actually understands', function () {
                 ->toBeTrue("$file maps a severity to '$colour', which Badge does not define");
         }
     }
+});
+
+it('leaves the nav alone when its own route is missing', function () {
+    // A route cache built before this addon was installed does not contain its
+    // CP routes, and Nav::extend runs on every control panel request including
+    // login. Unguarded, that took the whole control panel down with
+    // "Route [statamic.cp.a11y-docs.dashboard] not defined" - the addon
+    // breaking pages that have nothing to do with it. Seen on a Forge deploy.
+    $this->actingAs(User::make()->id('nav-guard')->email('guard@example.edu')->makeSuper()->save());
+
+    // Only this addon's route goes; Statamic's own must stay, or CoreNav fails
+    // for an unrelated reason and the test proves nothing.
+    $without = new RouteCollection;
+    foreach (Route::getRoutes() as $route) {
+        if ($route->getName() !== 'statamic.cp.a11y-docs.dashboard') {
+            $without->add($route);
+        }
+    }
+    Route::setRoutes($without);
+
+    expect(Route::has('statamic.cp.a11y-docs.dashboard'))->toBeFalse()
+        ->and(Route::has('statamic.cp.dashboard'))->toBeTrue();
+
+    $real = new StatamicNav;
+    Nav::swap($real);
+
+    $provider = new ServiceProvider(app());
+    $boot = new ReflectionMethod($provider, 'bootNavigation');
+    $boot->setAccessible(true);
+    $boot->invoke($provider);
+
+    $makeBaseItems = new ReflectionMethod($real, 'makeBaseItems');
+    $makeBaseItems->setAccessible(true);
+
+    // The point is that this does not throw. Our item is simply absent.
+    $ours = collect($makeBaseItems->invoke($real))
+        ->filter(fn ($item) => str_contains((string) $item->url(), 'a11y-docs'));
+
+    expect($ours)->toBeEmpty();
 });
