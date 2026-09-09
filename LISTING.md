@@ -8,6 +8,16 @@ Copy for the Statamic marketplace listing.
 
 **A11y Docs**
 
+Marketplace listing name, following the pattern the other two use
+(`A11y <Product>: <descriptor> for Statamic`):
+
+> **A11y Docs: PDF and Document Accessibility for Statamic**
+
+The subtitle carries "PDF" deliberately. It is the word people search, it is the
+liability that sells this, and it is the one term that separates this listing
+from the other two — neither of which mentions it. "Docs" on its own does not
+tell anyone this handles PDFs.
+
 ## Price
 
 $149 per site.
@@ -102,6 +112,25 @@ Third of three. Same vocabulary, same voice, same four severities.
 - **A11y Docs** — covers the asset library.
 
 All three should surface on a marketplace search for "a11y" or "accessibility".
+
+## Categories
+
+In order; the marketplace treats the first as primary.
+
+| | |
+|---|---|
+| **Utility** | Primary, matching A11y Gate and A11y Report. All three lead with it, so browsing Utility shows the suite together. |
+| **Assets** | The one category that separates this from the other two: Gate and Report work on entries and pages, this works on the asset library. Neither sibling can claim it. |
+| **CLI** | `docs:check`, `docs:report` and `docs:prune`, with a CI exit code. Both siblings use it too. |
+| **Fieldtype** | The addon registers one — `a11y_document_status` — and installation has the user add it to the asset blueprint by hand, so they meet it as a fieldtype. Same as Gate. |
+
+Deliberately not **Analytics**, which A11y Report uses: on a CMS marketplace that
+category means traffic and behaviour tools, and someone arriving from it wants
+Fathom, not a document inventory. Not **Widget** or **Tag** either — this addon
+registers neither.
+
+There is no Accessibility category on the marketplace. The suite is held
+together by the shared "A11y" name and the keywords below, not by a category.
 
 ## Keywords
 
