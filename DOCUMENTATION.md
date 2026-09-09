@@ -38,7 +38,7 @@ Set the concurrency low if veraPDF is installed. Each validation starts a JVM, a
 
 ## Showing status in the asset browser
 
-Add one field to the asset container's blueprint. The addon does not do this for you, because silently editing your blueprint on install is not a thing software should do.
+Add one field to the asset container's blueprint. The addon does not do this for you. It does not edit your blueprint on install.
 
 In the control panel: **Assets** > your container > **Edit blueprint**, then add a field of type **Document accessibility**. Mark it listable to show it as a column in the browser.
 
@@ -79,7 +79,7 @@ Checks every document in the asset library.
 
 By default it queues the work as a batch and returns immediately. Chunks run with a concurrency limit, and one unreadable document never takes down the run. `--sync` does the work in the foreground and ends by reporting how many documents were unchanged since the last run.
 
-**The CI exit code.** `--fail-on=<severity>` is the only thing that makes this command exit non-zero. Without it the command always exits 0, deliberately: a site installing this addon has a backlog of hundreds of existing problems, and a command that reddens their build on day one is a command they turn off on day one. Opt in once the backlog is under control.
+**The CI exit code.** `--fail-on=<severity>` is the only thing that makes this command exit non-zero. Without it the command always exits 0, deliberately: a site installing this addon has a backlog of hundreds of existing problems, and failing the build on day one is why the flag is opt-in. Turn it on once the backlog is under control.
 
 ### docs:report
 
@@ -99,15 +99,15 @@ Removes stored results for documents that are no longer in the library.
 - `php please docs:prune`
 - `php please docs:prune --dry-run`
 
-Each candidate is confirmed against the disk before anything is deleted, because a stale container listing would otherwise remove the results for documents that are still perfectly well there.
+Each candidate is confirmed against the disk before anything is deleted, because a stale container listing would otherwise remove the results for documents that are still present.
 
 **Exemptions are never pruned**, only counted and reported. A trail that deletes itself when the document goes is not an audit trail.
 
 ## The publish gate
 
-An entry that links to a document nobody can read can be stopped from being published.
+An entry that links to a document with critical accessibility problems can be stopped from being published.
 
-The thing to understand about the defaults is that a site installing this addon already has a backlog - often hundreds of bad PDFs uploaded years ago. A gate that blocks all of it on day one makes the site unpublishable, and that is not a bug report, it is an uninstall.
+The thing to understand about the defaults is that a site installing this addon already has a backlog - often hundreds of bad PDFs uploaded years ago. A gate that blocks all of it on day one makes the site unpublishable.
 
 So three protections ship on, and together they mean **installing this addon changes nothing about what you can publish today**.
 
@@ -129,7 +129,7 @@ Turn the gate off entirely by setting `gate.enabled` to `false`. The dashboard a
 
 ## Reports and exports
 
-**The report is held to its own standard.** A report about document accessibility that is itself an untagged PDF is the screenshot that ends up on social media. So the exported PDF is checked by this addon's own inspector, and by veraPDF, in the test suite. It is tagged, titled, language-tagged, and passes PDF/UA-1 validation.
+**The report is held to its own standard.** The exported PDF is checked by this addon's own inspector, and by veraPDF, in the test suite. It is tagged, titled, language-tagged, and passes PDF/UA-1 validation.
 
 Two things were needed to get there, both of which will bite anybody printing HTML to PDF with a browser:
 
@@ -146,7 +146,7 @@ It also says what it does not cover: these findings describe documents, not the 
 
 **Almost certainly not.** This section exists so that the answer is "no" before anybody has installed a Java runtime to find out.
 
-The built-in checks need nothing installed, take about a second per document, and find what is actually wrong with a real library: files with no tags at all, scans that are pictures of words, documents with no title or language, figures nobody described, forms whose fields are unlabelled, encryption that blocks a screen reader outright.
+The built-in checks need nothing installed, take about a second per document, and find the problems actually in a real library: files with no tags at all, scans that are pictures of words, documents with no title or language, figures with no alternative text, forms whose fields are unlabelled, encryption that blocks a screen reader outright.
 
 veraPDF needs a Java runtime, takes about a second and a half per document plus a JVM start, and answers a stricter question: formal PDF/UA-1 conformance. A document can fail that on details - a missing metadata packet, a font that is not embedded - while being perfectly readable.
 
