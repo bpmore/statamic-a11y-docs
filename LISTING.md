@@ -26,11 +26,17 @@ $99 per site.
 
 Find the documents in your asset library that nobody can read.
 
-## Short description (marketplace card)
+## Summary (marketplace card)
 
-Checks every PDF, Word, PowerPoint and Excel file in your asset library for
-accessibility problems, and stops new ones being published. No Java, no external
-services, no setup.
+Finds every PDF, Word, PowerPoint and Excel file with accessibility problems,
+and blocks new ones.
+
+96 characters. A11y Report and A11y Gate run 69 and 74, so a card summary is one
+short sentence; the earlier 176-character version would have truncated.
+
+Not "nobody can read", which is false for most findings - a missing title is
+serious, not unreadable. Not "is not accessible" either: the licence is explicit
+that this cannot judge a document accessible, only report problems it finds.
 
 ## Long description
 
