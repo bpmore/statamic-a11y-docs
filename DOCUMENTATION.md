@@ -94,6 +94,10 @@ Shows what the last scan found. Runs nothing.
 - `php please docs:report --pdf=report.pdf` - tagged PDF
 
 The PDF needs a browser installed. Without one you get the HTML and a sentence explaining why, not a failure.
+**A snap-confined browser cannot write outside your home directory.** Ubuntu ships Chromium as a snap, which is what Laravel Forge installs. It exits cleanly and reports the bytes it wrote, to a private path nothing else can see, so `--pdf=/tmp/report.pdf` produces no file and no obvious error. Write to a path inside the site instead:
+
+- `php please docs:report --pdf=storage/report.pdf`
+
 
 ### docs:prune
 

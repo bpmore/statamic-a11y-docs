@@ -48,6 +48,23 @@ point somewhere else:
 
 No browser installed is not an error: you get the HTML.
 
+## Snap-confined browsers
+
+Ubuntu ships Chromium as a snap, which is what Laravel Forge installs. A snap
+gets a private `/tmp` and cannot write outside your home directory. It exits
+cleanly and reports the bytes it wrote, to a path nothing else can see, so
+`--pdf=/tmp/report.pdf` produces no file and an error that reads as though the
+browser failed.
+
+Write to a path inside the site:
+
+```
+php please docs:report --pdf=storage/report.pdf
+```
+
+Measured on a Forge server: the `/tmp` destination produced nothing, the same
+run under the site directory produced a valid tagged PDF.
+
 ## Inside A11y Report
 
 When that addon is installed, these findings can appear in its conformance

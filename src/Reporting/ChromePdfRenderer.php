@@ -89,9 +89,11 @@ final class ChromePdfRenderer implements PdfRenderer
 
             if ($bytes === 0) {
                 throw new RuntimeException(sprintf(
-                    'The browser did not produce a PDF (exit %d): %s',
-                    $process->getExitCode() ?? -1,
-                    trim($process->getErrorOutput() ?: 'no output'),
+                    'The browser %s but wrote nothing to %s.%s%s',
+                    ($process->getExitCode() ?? -1) === 0 ? 'exited cleanly' : 'failed (exit '.$process->getExitCode().')',
+                    $destination,
+                    $this->confinementHint($destination),
+                    "\n".trim($process->getErrorOutput() ?: 'no output'),
                 ));
             }
         } finally {
@@ -102,6 +104,30 @@ final class ChromePdfRenderer implements PdfRenderer
         // validation on one clause — which, in a report about PDF/UA, is the
         // screenshot spec §12 warns about.
         $this->metadata->addTo($destination, $title);
+    }
+
+    /**
+     * Ubuntu ships Chromium as a snap, and a snap gets a private /tmp and
+     * cannot write outside the user's home. It exits 0 and reports the bytes it
+     * wrote, to a path nothing else can see, so the failure looks like the
+     * browser succeeding and this addon being wrong. Measured on a Forge server:
+     * --pdf=/tmp/report.pdf produced nothing, the same run under the site
+     * directory produced a valid PDF.
+     */
+    private function confinementHint(string $destination): string
+    {
+        $binary = $this->binary() ?? '';
+
+        $confined = str_starts_with($binary, '/snap/')
+            || str_contains($binary, 'chromium-browser')
+            || is_dir('/snap/chromium');
+
+        if (! $confined || str_starts_with($destination, (string) getenv('HOME'))) {
+            return '';
+        }
+
+        return ' This browser looks snap-confined, and a snap cannot write outside your home directory.'
+            .' Choose a destination inside the site, such as storage/report.pdf.';
     }
 
     private function binary(): ?string
