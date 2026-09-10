@@ -192,7 +192,7 @@ Run `docs:prune` occasionally to drop results for documents that have been delet
 
 The gate reads the page's rendered HTML. It cannot open a linked PDF, so an entry that links to an untagged document reads as passing there while this addon refuses the same save.
 
-When A11y Gate is installed, this addon adds a block to its entry panel listing the documents that page links to and what is wrong with them, so both addons say the same thing on the same screen. Nothing is registered when the gate is absent.
+When A11y Gate is installed, this addon adds a block to its entry panel listing the documents that page links to and what is wrong with them, so both addons say the same thing on the same screen. A refused publish is drawn in that block too, next to the documents it is about. Needs A11y Gate 0.9 or newer; with an older one the refusal appears under the entry's title field instead. Nothing is registered when the gate is absent.
 
 ## Alongside A11y Report
 

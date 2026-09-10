@@ -2,21 +2,32 @@
 
 declare(strict_types=1);
 
+use Bpmore\A11yGate\Panel\PanelExtensions;
 use Bpmore\DocumentA11yCore\DocumentInspector;
 use Bpmore\StatamicA11yDocs\AssetChecker;
 use Bpmore\StatamicA11yDocs\DocumentScanner;
+use Bpmore\StatamicA11yDocs\Gate\DocumentReferences;
 use Bpmore\StatamicA11yDocs\Gate\PublishGate;
+use Bpmore\StatamicA11yDocs\Listeners\GateEntryPublishing;
 use Bpmore\StatamicA11yDocs\Models\DocumentCheck;
 use Bpmore\StatamicA11yDocs\Models\DocumentExemption;
 use Bpmore\StatamicA11yDocs\Models\DocumentFinding;
+use Bpmore\StatamicA11yDocs\Panel\GatePanelBlock;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection as Collections;
 use Statamic\Facades\Entry;
 
 uses(RefreshDatabase::class);
+
+// A11y Gate is an optional companion, not a dependency, so its seam is absent
+// here. See the stub for what standing in for it does and does not prove.
+if (! class_exists(PanelExtensions::class)) {
+    require_once __DIR__.'/../Stubs/A11yGatePanelExtensions.php';
+}
 
 beforeEach(function () {
     config()->set('a11y-docs.verapdf.enabled', false);
@@ -215,6 +226,114 @@ it('attaches the refusal to a field the control panel will actually show', funct
         expect($fields->has($keys[0]))
             ->toBeTrue("the gate keys its error to '{$keys[0]}', which is not a field in the blueprint, so the control panel will not display it");
     }
+});
+
+it('draws the refusal in the gate panel when there is one on the screen', function () {
+    // It was keyed to `title`, so "this entry links to 1 document that people
+    // using a screen reader cannot read" appeared under the title field and
+    // read as a fault in the title. A11y Gate's panel draws whatever it finds
+    // under a block's refusalKey, and this addon already registers a block
+    // about exactly these documents.
+    Blueprint::make('pages')->setNamespace('collections.pages')->setContents([
+        'tabs' => ['main' => ['sections' => [['fields' => [
+            ['handle' => 'title', 'field' => ['type' => 'text']],
+            ['handle' => 'a11y_panel', 'field' => ['type' => 'accessibility_panel']],
+        ]]]]],
+    ])->save();
+
+    ($this->put)('reports/handbook.pdf', 'pdf/untagged.pdf');
+    $this->artisan('docs:check --sync');
+    ($this->ungrandfathered)();
+
+    $entry = ($this->page)(['attachments' => ['reports/handbook.pdf']]);
+
+    try {
+        $entry->save();
+        $this->fail('the entry should not have saved');
+    } catch (ValidationException $exception) {
+        expect(array_keys($exception->errors()))->toBe([GateEntryPublishing::REFUSAL_KEY])
+            ->and($exception->errors()[GateEntryPublishing::REFUSAL_KEY][0])->toContain('cannot read');
+    }
+});
+
+it('falls back to a field when the panel is not on the blueprint', function () {
+    // The gate being installed is not the question. An author can remove the
+    // panel field, and a refusal keyed to a panel that is not on the screen is
+    // carried in the response and dropped: the publish button does nothing and
+    // says nothing. Misplaced beats invisible.
+    Blueprint::make('pages')->setNamespace('collections.pages')->setContents([
+        'tabs' => ['main' => ['sections' => [['fields' => [
+            ['handle' => 'title', 'field' => ['type' => 'text']],
+        ]]]]],
+    ])->save();
+
+    ($this->put)('reports/handbook.pdf', 'pdf/untagged.pdf');
+    $this->artisan('docs:check --sync');
+    ($this->ungrandfathered)();
+
+    $entry = ($this->page)(['attachments' => ['reports/handbook.pdf']]);
+
+    try {
+        $entry->save();
+        $this->fail('the entry should not have saved');
+    } catch (ValidationException $exception) {
+        $key = array_key_first($exception->errors());
+
+        expect($key)->not->toBe(GateEntryPublishing::REFUSAL_KEY)
+            ->and($entry->blueprint()->fields()->all()->has($key))
+            ->toBeTrue("keyed to '{$key}', which the control panel will not show");
+    }
+});
+
+it('does not key to the panel when the gate is too old to draw it', function () {
+    // The gate ships separately. A version before refusalKey existed ignores
+    // the key silently: the save is still refused and nothing says why, which
+    // is worse than the misplaced error this replaces.
+    Blueprint::make('pages')->setNamespace('collections.pages')->setContents([
+        'tabs' => ['main' => ['sections' => [['fields' => [
+            ['handle' => 'title', 'field' => ['type' => 'text']],
+            ['handle' => 'a11y_panel', 'field' => ['type' => 'accessibility_panel']],
+        ]]]]],
+    ])->save();
+
+    $capabilities = PanelExtensions::$capabilities;
+    PanelExtensions::$capabilities = [];
+
+    ($this->put)('reports/handbook.pdf', 'pdf/untagged.pdf');
+    $this->artisan('docs:check --sync');
+    ($this->ungrandfathered)();
+
+    $entry = ($this->page)(['attachments' => ['reports/handbook.pdf']]);
+
+    try {
+        $entry->save();
+        $this->fail('the entry should not have saved');
+    } catch (ValidationException $exception) {
+        $key = array_key_first($exception->errors());
+
+        expect($key)->toBe('title')
+            ->and($entry->blueprint()->fields()->all()->has($key))->toBeTrue();
+    } finally {
+        PanelExtensions::$capabilities = $capabilities;
+    }
+});
+
+it('names the same refusal key the panel block hands the gate', function () {
+    // Two files have to agree or the refusal is sent to a key nothing reads,
+    // and nothing would fail: the save is still refused, the panel just says
+    // nothing about why.
+    $block = (new GatePanelBlock(app(DocumentReferences::class)))(($this->page)([]));
+
+    expect($block)->toBeNull();
+
+    ($this->put)('reports/handbook.pdf', 'pdf/untagged.pdf');
+    $this->artisan('docs:check --sync');
+
+    $block = (new GatePanelBlock(app(DocumentReferences::class)))(
+        ($this->page)(['attachments' => ['reports/handbook.pdf']])
+    );
+
+    expect($block['refusalKey'])->toBe(GateEntryPublishing::REFUSAL_KEY);
 });
 
 it('does not stand in the way of a draft', function () {

@@ -57,6 +57,11 @@ and a list.
 The save is refused with the reason attached — which documents, what is wrong
 with them, and the way out:
 
+With A11y Gate 0.9 or newer installed, this appears in the gate's panel in the
+sidebar, in the same block that lists the documents on the page. Without it,
+Statamic will only render a validation error next to a blueprint field, so the
+refusal appears under the entry's title.
+
 > This entry links to 2 documents that people using a screen reader cannot read:
 > **reports/handbook.pdf** — This PDF has no tags. A screen reader cannot tell a
 > heading from body text…

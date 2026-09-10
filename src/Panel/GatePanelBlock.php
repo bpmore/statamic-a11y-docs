@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bpmore\StatamicA11yDocs\Panel;
 
 use Bpmore\StatamicA11yDocs\Gate\DocumentReferences;
+use Bpmore\StatamicA11yDocs\Listeners\GateEntryPublishing;
 use Bpmore\StatamicA11yDocs\Models\DocumentCheck;
 use Bpmore\StatamicA11yDocs\RuleLabel;
 use Illuminate\Support\Collection;
@@ -18,6 +19,11 @@ use Statamic\Contracts\Entries\Entry;
  * Two addons giving an author opposite answers on the same screen is worse than
  * either being absent, and this closes it: the gate's verdict stays about the
  * page, and the documents it links to are reported underneath.
+ *
+ * Every block names a `refusalKey`, which is where a refused publish is drawn.
+ * The gate's panel reads that key off the publish container, so the reason a
+ * save was stopped appears in this block rather than under whichever blueprint
+ * field the error had to be keyed to in order to be shown at all.
  *
  * Registered only when the gate is installed. Nothing here runs otherwise.
  */
@@ -49,6 +55,7 @@ final class GatePanelBlock
                     'Run `php please docs:check` to read them.',
                 ],
                 'tone' => 'warning',
+                'refusalKey' => GateEntryPublishing::REFUSAL_KEY,
             ];
         }
 
@@ -59,6 +66,7 @@ final class GatePanelBlock
                 'heading' => 'Documents on this page',
                 'lines' => [$this->count($checks->count()).', and nothing was found wrong with any of them.'],
                 'tone' => 'default',
+                'refusalKey' => GateEntryPublishing::REFUSAL_KEY,
             ];
         }
 
@@ -79,6 +87,7 @@ final class GatePanelBlock
             'heading' => 'Documents on this page',
             'lines' => $lines,
             'tone' => $this->tone($withProblems),
+            'refusalKey' => GateEntryPublishing::REFUSAL_KEY,
             'link' => [
                 'url' => cp_route('a11y-docs.queue'),
                 'text' => 'Open the remediation queue',
