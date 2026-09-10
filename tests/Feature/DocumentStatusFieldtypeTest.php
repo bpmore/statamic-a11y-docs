@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Bpmore\DocumentA11yCore\DocumentInspector;
 use Bpmore\StatamicA11yDocs\AssetChecker;
 use Bpmore\StatamicA11yDocs\DocumentScanner;
+use Bpmore\StatamicA11yDocs\Fieldtypes\DocumentStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Facades\AssetContainer;
@@ -141,4 +142,20 @@ it('shows what could not be checked separately from what passed', function () {
 
     expect(array_column($value['unchecked'], 'rule'))->toContain('pdf.no_title')
         ->and($value['unchecked'][0]['reason'])->toContain('encrypted');
+});
+
+it('is selectable, because installation asks the user to pick it', function () {
+    // docs/installation.md says: add a field of type "Document accessibility".
+    // It shipped with selectable = false, so that field was not in the picker
+    // and the documented install could not be completed.
+    $fieldtype = new DocumentStatus;
+
+    expect($fieldtype->selectable())->toBeTrue()
+        ->and(DocumentStatus::title())->toBe('Document accessibility');
+});
+
+it('stays out of a form\'s field picker', function () {
+    // It reads a check result for an asset. A form submission has nothing to
+    // put in it.
+    expect((new DocumentStatus)->selectableInForms())->toBeFalse();
 });

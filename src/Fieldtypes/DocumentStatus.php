@@ -23,7 +23,20 @@ class DocumentStatus extends Fieldtype
 {
     protected static $handle = 'a11y_document_status';
 
-    protected $selectable = false;
+    protected static $title = 'Document accessibility';
+
+    protected $categories = ['special'];
+
+    protected $icon = 'file-content-list';
+
+    // Selectable, because installation asks the user to add this to their asset
+    // blueprint by hand. It shipped unselectable, which made the documented
+    // install impossible: the field simply was not in the picker.
+    protected $selectable = true;
+
+    // Not in a form's field picker: it reads a check result for an asset, and
+    // there is nothing for a form submission to put in it.
+    protected $selectableInForms = false;
 
     public function preProcess($value): ?array
     {
