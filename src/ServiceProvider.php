@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bpmore\StatamicA11yDocs;
 
+use Bpmore\A11yGate\Panel\PanelExtensions;
 use Bpmore\DocumentA11yCore\DocumentInspector;
 use Bpmore\DocumentA11yCore\Inspector;
 use Bpmore\DocumentA11yCore\LegacyOfficeInspector;
@@ -65,6 +66,7 @@ class ServiceProvider extends AddonServiceProvider
     {
         $this->bootPermissions();
         $this->bootNavigation();
+        $this->bootGatePanel();
 
         // The addon's own SQLite connection, unless the site named one of its
         // own. Defined here rather than in register() because it reads the
@@ -79,6 +81,28 @@ class ServiceProvider extends AddonServiceProvider
         $this->publishes([
             __DIR__.'/../database/migrations' => database_path('migrations'),
         ], 'a11y-docs-migrations');
+    }
+
+    /**
+     * Add a block to A11y Gate's entry panel, when that addon is installed.
+     *
+     * The gate reads rendered HTML and cannot open a linked PDF, so an entry
+     * linking to an untagged document reads as passing there while failing
+     * here. Two addons giving opposite answers on one screen is worse than
+     * either being absent.
+     *
+     * Guarded on the class existing, so this addon has no dependency on the
+     * gate and nothing runs when it is not there.
+     */
+    private function bootGatePanel(): void
+    {
+        if (! class_exists(PanelExtensions::class)) {
+            return;
+        }
+
+        PanelExtensions::register(
+            fn ($entry) => $this->app->make(Panel\GatePanelBlock::class)($entry)
+        );
     }
 
     /**

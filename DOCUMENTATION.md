@@ -186,6 +186,12 @@ Schedule a scan in `routes/console.php` with `Schedule::command('docs:check')->d
 
 Run `docs:prune` occasionally to drop results for documents that have been deleted.
 
+## Alongside A11y Gate
+
+The gate reads the page's rendered HTML. It cannot open a linked PDF, so an entry that links to an untagged document reads as passing there while this addon refuses the same save.
+
+When A11y Gate is installed, this addon adds a block to its entry panel listing the documents that page links to and what is wrong with them, so both addons say the same thing on the same screen. Nothing is registered when the gate is absent.
+
 ## Alongside A11y Report
 
 When that addon is installed, these findings can appear in its conformance report as a clearly labelled appendix, rather than being folded into the WCAG criteria table - document conformance is PDF/UA and Section 508 Chapter 5 territory, and merging the two is a category error an auditor would catch.
