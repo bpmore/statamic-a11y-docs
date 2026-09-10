@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use Bpmore\StatamicA11yDocs\Models\DocumentCheck;
 use Bpmore\StatamicA11yDocs\Storage\DocumentDatabase;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schema;
 
 it('defaults to a SQLite file the addon owns, so a flat-file site needs no database', function () {
     // Most Statamic sites are flat-file. Requiring a database before somebody
@@ -58,4 +60,44 @@ it('models read the connection at call time, not when the class was loaded', fun
 
     config(['a11y-docs.connection' => 'beta']);
     expect((new DocumentCheck)->getConnectionName())->toBe('beta');
+});
+
+it('applies a migration added after the tables were first created', function () {
+    // docs:install returned early on "the tables exist", so a column added in a
+    // later release never reached a site that installed an earlier one. The
+    // withdraw action needs `revoked_by`, and it was missing everywhere.
+    $file = sys_get_temp_dir().'/a11y-docs-upgrade-'.uniqid().'.sqlite';
+    touch($file);
+
+    config([
+        'a11y-docs.connection' => 'a11y_docs_upgrade',
+        'database.connections.a11y_docs_upgrade' => [
+            'driver' => 'sqlite',
+            'database' => $file,
+            'prefix' => '',
+        ],
+    ]);
+
+    // The state an older install is in: every migration but the newest.
+    foreach (['000100_create_document_checks', '000200_create_document_findings', '000300_create_document_exemptions'] as $name) {
+        Artisan::call('migrate', [
+            '--database' => 'a11y_docs_upgrade',
+            '--path' => realpath(__DIR__.'/../../database/migrations').'/2026_09_08_'.$name.'_table.php',
+            '--realpath' => true,
+            '--force' => true,
+        ]);
+    }
+
+    $database = app(DocumentDatabase::class);
+
+    expect($database->isInstalled())->toBeTrue()
+        ->and(Schema::connection('a11y_docs_upgrade')->hasColumn('document_exemptions', 'revoked_by'))->toBeFalse()
+        ->and($database->pendingMigrations())->toHaveCount(1);
+
+    $this->artisan('docs:install')->assertExitCode(0);
+
+    expect(Schema::connection('a11y_docs_upgrade')->hasColumn('document_exemptions', 'revoked_by'))->toBeTrue()
+        ->and($database->pendingMigrations())->toBe([]);
+
+    unlink($file);
 });

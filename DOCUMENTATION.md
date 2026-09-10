@@ -15,6 +15,8 @@ Require the package, create the tables, and take a first look:
 
 `docs:install` creates three tables: `document_checks`, `document_findings` and `document_exemptions`. By default they go in a SQLite file the addon creates for itself under `storage/a11y-docs/`, so a flat-file site needs nothing else. To put them in a database the site already runs, set `A11Y_DOCS_CONNECTION` to one of its connection names, or set `connection` in the config, and run the command again.
 
+Run `docs:install` again after upgrading the package. It reports "already installed" when there is nothing to do, and applies any table changes a newer version needs.
+
 The first scan reads every document in every asset container. Subsequent scans read only what changed, because the check is a hash comparison.
 
 ## Configuration
@@ -122,7 +124,7 @@ So three protections ship on, and together they mean **installing this addon cha
 
 **2. Only critical problems block.** Critical means somebody genuinely cannot read the document: no tags at all, a scan with no text layer, encryption that blocks assistive technology. A document missing a language declaration is *serious*, and does not block.
 
-**3. Exemptions.** Any document can be exempted, with a required reason and an optional expiry. An exemption without a reason is a way of turning the addon off one file at a time, so the reason is required and has to say something. Exempt from the asset browser or the remediation queue, singly or in bulk. Exemptions are append-only: withdrawing one records that it was withdrawn rather than deleting the record, because that is the difference between an audit trail and a list.
+**3. Exemptions.** Any document can be exempted, with a required reason and an optional expiry. An exemption without a reason is a way of turning the addon off one file at a time, so the reason is required and has to say something. Exempt from the asset browser or the remediation queue, singly or in bulk, with **Exempt from accessibility checks**. To end one, use **Withdraw accessibility exemption** on the same document; it appears only where there is an exemption to withdraw, and the document is gated again from that point. Exemptions are append-only: withdrawing one records who ended it and when rather than deleting the record, because that is the difference between an audit trail and a list.
 
 **What a blocked publish looks like.** The save is refused with the reason attached - which documents, what is wrong with them, and the way out:
 

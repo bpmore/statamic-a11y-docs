@@ -36,6 +36,7 @@ class ServiceProvider extends AddonServiceProvider
     protected $actions = [
         Actions\RecheckDocument::class,
         Actions\ExemptDocument::class,
+        Actions\WithdrawExemption::class,
     ];
 
     protected $routes = [

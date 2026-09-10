@@ -28,7 +28,23 @@ class InstallDocuments extends Command
         $connection = DocumentDatabase::connectionName();
 
         if ($database->isInstalled()) {
-            $this->components->info("Already installed on [{$connection}].");
+            $pending = $database->pendingMigrations();
+
+            if ($pending === []) {
+                $this->components->info("Already installed on [{$connection}].");
+
+                return self::SUCCESS;
+            }
+
+            // An upgrade, not an install. Running the outstanding migrations is
+            // what this command is for, and nothing else here needs to happen.
+            foreach ($database->install() as $line) {
+                $this->components->info($line);
+            }
+
+            $this->components->info(
+                'Applied '.count($pending).' new '.(count($pending) === 1 ? 'migration' : 'migrations').'.'
+            );
 
             return self::SUCCESS;
         }

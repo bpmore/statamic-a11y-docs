@@ -10,6 +10,7 @@ use Bpmore\DocumentA11yCore\Pdf\PdfRule;
 use Bpmore\DocumentA11yCore\Version;
 use Bpmore\StatamicA11yDocs\Actions\ExemptDocument;
 use Bpmore\StatamicA11yDocs\Actions\RecheckDocument;
+use Bpmore\StatamicA11yDocs\Actions\WithdrawExemption;
 use Bpmore\StatamicA11yDocs\AssetChecker;
 use Bpmore\StatamicA11yDocs\DocumentScanner;
 use Bpmore\StatamicA11yDocs\Gate\PublishGate;
@@ -187,6 +188,98 @@ it('exempts several documents at once', function () {
     );
 
     expect(DocumentExemption::count())->toBe(2);
+});
+
+it('withdraws an exemption without deleting the record', function () {
+    // The documentation promised withdrawal from the first release and there
+    // was no way to do it: the column existed, nothing set it. An exemption
+    // was permanent from the control panel.
+    ($this->put)('handbook.pdf', 'pdf/untagged.pdf');
+    $this->artisan('docs:check --sync');
+    $this->actingAs($this->user);
+
+    $asset = $this->container->asset('handbook.pdf');
+
+    (new ExemptDocument)->run(collect([$asset]), [
+        'reason' => 'Superseded by the 2027 edition; kept for the archive.',
+    ]);
+
+    $result = (new WithdrawExemption)->run(collect([$asset]), []);
+
+    $exemption = DocumentExemption::first();
+
+    expect(DocumentExemption::count())->toBe(1)
+        ->and($exemption->reason)->toContain('Superseded')
+        ->and($exemption->revoked_at)->not->toBeNull()
+        ->and($exemption->revoked_by)->toBe('tester')
+        ->and($exemption->isActive())->toBeFalse()
+        ->and(DocumentExemption::query()->active()->count())->toBe(0)
+        ->and($result)->toContain('gated again');
+});
+
+it('offers withdrawal only where there is an exemption to withdraw', function () {
+    ($this->put)('handbook.pdf', 'pdf/untagged.pdf');
+    $this->artisan('docs:check --sync');
+    $this->actingAs($this->user);
+
+    $asset = $this->container->asset('handbook.pdf');
+    $action = new WithdrawExemption;
+
+    expect($action->visibleTo($asset))->toBeFalse();
+
+    (new ExemptDocument)->run(collect([$asset]), [
+        'reason' => 'Superseded by the 2027 edition; kept for the archive.',
+    ]);
+
+    expect($action->visibleTo($this->container->asset('handbook.pdf')))->toBeTrue();
+
+    $action->run(collect([$asset]), []);
+
+    expect($action->visibleTo($this->container->asset('handbook.pdf')))->toBeFalse();
+});
+
+it('gates a document again once its exemption is withdrawn', function () {
+    // The point of withdrawal. If the gate still lets the entry through, the
+    // record changed and the behaviour did not.
+    ($this->put)('handbook.pdf', 'pdf/untagged.pdf');
+    $this->artisan('docs:check --sync');
+    $this->actingAs($this->user);
+
+    $asset = $this->container->asset('handbook.pdf');
+
+    (new ExemptDocument)->run(collect([$asset]), [
+        'reason' => 'Superseded by the 2027 edition; kept for the archive.',
+    ]);
+
+    expect(DocumentExemption::query()->active()->forAsset($asset->id())->exists())->toBeTrue();
+
+    (new WithdrawExemption)->run(collect([$asset]), []);
+
+    expect(DocumentExemption::query()->active()->forAsset($asset->id())->exists())->toBeFalse();
+});
+
+it('keeps the time an exemption was actually withdrawn', function () {
+    // Running the action twice must not re-stamp the first withdrawal, or the
+    // recorded time stops being the time somebody decided.
+    ($this->put)('handbook.pdf', 'pdf/untagged.pdf');
+    $this->artisan('docs:check --sync');
+    $this->actingAs($this->user);
+
+    $asset = $this->container->asset('handbook.pdf');
+
+    (new ExemptDocument)->run(collect([$asset]), [
+        'reason' => 'Superseded by the 2027 edition; kept for the archive.',
+    ]);
+
+    (new WithdrawExemption)->run(collect([$asset]), []);
+    $first = DocumentExemption::first()->revoked_at;
+
+    $this->travel(5)->minutes();
+    $again = DocumentExemption::first()->withdraw('someone-else');
+
+    expect($again)->toBeFalse()
+        ->and(DocumentExemption::first()->revoked_at->equalTo($first))->toBeTrue()
+        ->and(DocumentExemption::first()->revoked_by)->toBe('tester');
 });
 
 it('writes a headline in words, never a rule id', function () {
