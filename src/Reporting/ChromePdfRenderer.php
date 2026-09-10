@@ -68,10 +68,31 @@ final class ChromePdfRenderer implements PdfRenderer
             $process->setTimeout($this->timeoutSeconds);
             $process->run();
 
-            if (! is_file($destination) || filesize($destination) === 0) {
-                throw new RuntimeException(
-                    'The browser did not produce a PDF: '.trim($process->getErrorOutput() ?: 'no output')
-                );
+            // Chromium reported "16690 bytes written" on a real server while
+            // this check said the file was absent. Two candidates and no way to
+            // tell them apart from here: PHP caches stat results, and the write
+            // is not always visible the instant the process exits. Clearing the
+            // cache and looking again for a moment covers both. The exit code
+            // goes in the message so a genuine failure is still diagnosable.
+            $bytes = 0;
+
+            for ($attempt = 0; $attempt < 20; $attempt++) {
+                clearstatcache(true, $destination);
+                $bytes = is_file($destination) ? (int) filesize($destination) : 0;
+
+                if ($bytes > 0) {
+                    break;
+                }
+
+                usleep(50_000);
+            }
+
+            if ($bytes === 0) {
+                throw new RuntimeException(sprintf(
+                    'The browser did not produce a PDF (exit %d): %s',
+                    $process->getExitCode() ?? -1,
+                    trim($process->getErrorOutput() ?: 'no output'),
+                ));
             }
         } finally {
             @unlink($source);

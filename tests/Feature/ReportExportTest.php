@@ -175,3 +175,39 @@ it('names each rule in words and cites its id', function () {
     expect(preg_match('/aria-hidden[^>]*>\s*<code/i', $html) === 1)->toBeFalse();
     expect($html)->toContain('class="rule-id"');
 });
+
+it('accepts a PDF written by the browser process', function () {
+    // Drives the renderer through a stub browser, so the success path is
+    // covered without a real Chrome.
+    //
+    // It does NOT reproduce the failure this was written after: on a real
+    // server Chromium reported "16690 bytes written to file /tmp/report.pdf"
+    // and the renderer threw anyway. Removing clearstatcache still leaves this
+    // green, so the stat-cache explanation is unproven and this is not a
+    // regression test for it. The retry-and-clear is defensive.
+    $destination = ($this->tempFile)('pdf');
+    @unlink($destination);
+
+    // Prime PHP's stat cache with the file absent, which is the state the real
+    // failure was in by the time the check ran.
+    expect(is_file($destination))->toBeFalse();
+
+    $browser = ($this->tempFile)('sh');
+    file_put_contents($browser, <<<'SH'
+        #!/bin/sh
+        for arg in "$@"; do
+          case "$arg" in
+            --print-to-pdf=*) printf '%%PDF-1.4 stub' > "${arg#--print-to-pdf=}" ;;
+          esac
+        done
+        echo "14 bytes written" >&2
+        SH);
+    chmod($browser, 0755);
+
+    // The real metadata writer runs; it leaves a file alone when it cannot
+    // safely add a packet, which a stub PDF cannot.
+    (new ChromePdfRenderer($browser, 30))->render('<p>hi</p>', $destination);
+
+    expect(is_file($destination))->toBeTrue()
+        ->and(filesize($destination))->toBeGreaterThan(0);
+});
