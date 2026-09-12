@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "867b5e6c9e955d1df8c8dfe6da37fa55",
+    "content-hash": "90eb0c9cda4f880161253ce71afb703d",
     "packages": [
         {
             "name": "ajthinking/archetype",
@@ -9285,6 +9285,81 @@
     ],
     "packages-dev": [
         {
+            "name": "bpmore/statamic-site-weather",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "../statamic-site-weather",
+                "reference": "d28ff032bb9d1c0ebc40d432b170501359479698"
+            },
+            "require": {
+                "php": "^8.2",
+                "statamic/cms": "^6.0"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.18",
+                "orchestra/testbench": "^10.8 || ^11.0",
+                "pestphp/pest": "^3.0"
+            },
+            "type": "statamic-addon",
+            "extra": {
+                "statamic": {
+                    "name": "Site Weather",
+                    "slug": "site-weather",
+                    "description": "Your site's health as weather. Sunny, overcast, drizzle, storm."
+                },
+                "laravel": {
+                    "providers": [
+                        "Bpmore\\SiteWeather\\ServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Bpmore\\SiteWeather\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Bpmore\\SiteWeather\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "pest"
+                ],
+                "lint": [
+                    "pint"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Brent Passmore"
+                }
+            ],
+            "description": "One dashboard tile that shows your site's overall health as weather, read from the addons that already measure it.",
+            "homepage": "https://github.com/bpmore/statamic-site-weather",
+            "keywords": [
+                "accessibility",
+                "dashboard",
+                "health",
+                "statamic",
+                "widget"
+            ],
+            "support": {
+                "issues": "https://github.com/bpmore/statamic-site-weather/issues",
+                "source": "https://github.com/bpmore/statamic-site-weather",
+                "docs": "https://github.com/bpmore/statamic-site-weather/blob/main/README.md"
+            },
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
             "name": "brianium/paratest",
             "version": "v7.8.5",
             "source": {
@@ -12747,7 +12822,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "bpmore/statamic-site-weather": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

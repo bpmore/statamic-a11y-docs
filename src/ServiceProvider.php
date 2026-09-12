@@ -167,6 +167,12 @@ class ServiceProvider extends AddonServiceProvider
     {
         parent::register();
 
+        // Site Weather's tile, if it is installed. A tag is a string: tagging
+        // the class name instantiates nothing, so without Site Weather the
+        // class is never loaded and the interface it implements is never
+        // looked for.
+        $this->app->tag(Weather\DocumentsContributor::class, 'site-weather.contributors');
+
         // The one place the framework meets the framework-agnostic package.
         // Everything the addon does with a document goes through this.
         $this->app->singleton(DocumentInspector::class, function ($app): DocumentInspector {
