@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bpmore\StatamicA11yDocs\Tests;
 
 use Bpmore\StatamicA11yDocs\ServiceProvider;
+use Statamic\Facades\Blueprint;
 use Statamic\Testing\AddonTestCase;
 use Statamic\Testing\Concerns\PreventsSavingStacheItemsToDisk;
 
@@ -35,6 +36,13 @@ abstract class TestCase extends AddonTestCase
         parent::setUp();
 
         config(['a11y-docs.connection' => config('database.default')]);
+
+        // Blueprints are not Stache items, so the trait above does not catch
+        // them: a blueprint saved in one test is written into Testbench's
+        // skeleton and is still there on the next run, where a test that
+        // expects no panel on the blueprint finds one. Point them at the same
+        // throwaway directory, which is emptied between tests.
+        Blueprint::setDirectory($this->fakeStacheDirectory.'/blueprints');
     }
 
     /**
