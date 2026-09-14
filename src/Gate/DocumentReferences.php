@@ -89,8 +89,15 @@ final class DocumentReferences
 
     private function looksLikeDocument(string $value): bool
     {
+        // parse_url() returns false, not null, for a value it cannot parse,
+        // and `statamic://entry::<id>` is one: the `::` breaks the host. So
+        // `?:`, not `??`, or pathinfo(false) is a TypeError on every internal
+        // link. The whole value is as good a fallback as any: it has no
+        // document extension either way.
+        $path = parse_url($value, PHP_URL_PATH) ?: $value;
+
         return in_array(
-            strtolower(pathinfo(parse_url($value, PHP_URL_PATH) ?? $value, PATHINFO_EXTENSION)),
+            strtolower(pathinfo($path, PATHINFO_EXTENSION)),
             $this->extensions(),
             true,
         );

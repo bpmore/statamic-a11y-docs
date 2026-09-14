@@ -81,6 +81,31 @@ it('finds a document linked from prose', function () {
     expect(app(PublishGate::class)->blockers($entry))->toHaveCount(1);
 });
 
+it('is not thrown by a link to another entry', function () {
+    // A Bard link mark, a Link field or a related field stores
+    // `statamic://entry::<id>`. parse_url() calls that malformed and returns
+    // false, not null, and pathinfo(false) is a TypeError on every save of a
+    // page with an internal link. Reported from greenhouse.
+    ($this->put)('reports/handbook.pdf', 'pdf/untagged.pdf');
+    $this->artisan('docs:check --sync');
+    ($this->ungrandfathered)();
+
+    $entry = ($this->page)([
+        'related' => 'statamic://entry::7973e1d4-a99c-49e2-84ac-0a1af066e34b',
+        'body' => [['type' => 'paragraph', 'content' => [
+            ['type' => 'text', 'text' => 'See also', 'marks' => [['type' => 'link', 'attrs' => ['href' => 'statamic://entry::7973e1d4-a99c-49e2-84ac-0a1af066e34b']]]],
+            ['type' => 'text', 'text' => ' and the ', 'marks' => []],
+            ['type' => 'text', 'text' => 'handbook', 'marks' => [['type' => 'link', 'attrs' => ['href' => '/assets/documents/reports/handbook.pdf']]]],
+        ]]],
+    ]);
+
+    $blockers = app(PublishGate::class)->blockers($entry);
+
+    // The entry link is not a document; the handbook next to it still is.
+    expect($blockers)->toHaveCount(1)
+        ->and($blockers->first()->path)->toBe('reports/handbook.pdf');
+});
+
 it('lets an entry through when its documents are fine', function () {
     ($this->put)('reports/policy.docx', 'docx/good.docx');
     $this->artisan('docs:check --sync');

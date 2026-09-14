@@ -11,6 +11,22 @@ nothing.
 
 Versions are `MAJOR.MINOR.PATCH`.
 
+## 1.3.1 - 2026-09-14
+
+### Fixed, where a save fell over
+
+**Saving an entry that links to another entry no longer fails with a
+`TypeError`.** A Bard link mark, a Link field or a `related` field stores
+`statamic://entry::<id>`, and `parse_url()` calls that malformed, returning
+`false` rather than `null`. The gate's document check only guarded against
+`null`, so `false` reached `pathinfo()` and every save of a page with an
+internal link was a 500 while the gate was on. Found by the greenhouse seeder.
+
+The entry link is not a document and never was; it is simply skipped now, and
+a document linked in the same paragraph is still found.
+
+Upgrading re-checks nothing.
+
 ## 1.3.0 - 2026-09-10
 
 ### Fixed, where the refusal was in the wrong place
