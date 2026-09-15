@@ -11,7 +11,7 @@ nothing.
 
 Versions are `MAJOR.MINOR.PATCH`.
 
-## Unreleased
+## 1.3.2 - 2026-09-15
 
 ### Changed, in the control panel only
 
