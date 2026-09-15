@@ -62,7 +62,7 @@ Grey never means "fine". It means nothing was looked at.
 
 ## Permissions
 
-Three, under **Documents** in the role editor:
+Three, under **Document checks** in the role editor:
 
 - **View document accessibility results** - see the dashboard, the queue, and each document's findings
 - **Run document scans** - re-check a document after fixing it

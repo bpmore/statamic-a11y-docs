@@ -11,6 +11,19 @@ nothing.
 
 Versions are `MAJOR.MINOR.PATCH`.
 
+## Unreleased
+
+### Changed, in the control panel only
+
+**The nav item is "Document checks", under Tools.** It was "Documents" under
+Content, which read as a place to manage documents and sat next to Assets,
+where the documents actually live. Nothing on these pages creates or edits a
+document; they check them, so they sit with the other checks. The permission
+group in the role editor is renamed to match. Permissions themselves are
+unchanged, so nobody loses access.
+
+Upgrading re-checks nothing.
+
 ## 1.3.1 - 2026-09-14
 
 ### Fixed, where a save fell over
