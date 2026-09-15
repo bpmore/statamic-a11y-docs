@@ -94,7 +94,7 @@ is what was actually found rather than what somebody last remembered to save.
 
 ## Permissions
 
-Three, under **Documents** in the role editor:
+Three, under **Document checks** in the role editor:
 
 | Permission | Lets somebody |
 |---|---|

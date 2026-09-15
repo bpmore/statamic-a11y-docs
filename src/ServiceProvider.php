@@ -115,7 +115,7 @@ class ServiceProvider extends AddonServiceProvider
      */
     private function bootPermissions(): void
     {
-        Permission::group('a11y-docs', __('Documents'), function (): void {
+        Permission::group('a11y-docs', __('Document checks'), function (): void {
             Permission::register('view document checks')
                 ->label(__('View document accessibility results'))
                 ->description(__('See the documents dashboard, the remediation queue, and each document\'s findings.'))
@@ -153,7 +153,11 @@ class ServiceProvider extends AddonServiceProvider
             // Not 'assets': that is the icon Statamic's own Assets item uses, so
             // the sidebar showed the same picture twice. 'file-content-list' is
             // a page with its lines checked off, which is what this does.
-            $nav->content(__('Documents'))
+            //
+            // Under Tools, with the other checks, and named for what it is. As
+            // "Documents" under Content it read as a place to manage documents
+            // and sat next to Assets, where the documents actually live.
+            $nav->tools(__('Document checks'))
                 ->route('a11y-docs.dashboard')
                 ->icon('file-content-list');
         });
