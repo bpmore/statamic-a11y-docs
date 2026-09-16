@@ -13,18 +13,6 @@ Versions are `MAJOR.MINOR.PATCH`.
 
 ## Unreleased
 
-### Added, for the dashboard
-
-**A Documents band on Site Weather's tile**, when the free Site Weather addon
-is installed. The band reads the numbers the dashboard already draws and turns
-them into weather: clear when nothing fails, through fair, overcast and rain,
-to storm when a tenth of the library or more has critical problems. Installed
-but never set up, or nothing checked yet, reads as *unknown* — never as clear.
-Clicking the band opens this addon's dashboard.
-
-Site Weather is suggested, not required; without it nothing changes. Upgrading
-re-reads nothing.
-
 ### Fixed, in the control panel
 
 **The remediation queue can reach page two.** It has always been fifty
