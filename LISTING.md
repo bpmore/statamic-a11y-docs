@@ -75,6 +75,10 @@ reprocessed nightly.
 nothing claims formal PDF/UA validation it did not perform. The exported report
 is itself a tagged PDF that passes PDF/UA validation.
 
+**It shows on the dashboard.** With the free Site Weather addon installed, the
+library's state is one band on the dashboard tile, worst first, from clear to
+storm, and clicks through to the remediation queue.
+
 Optional: install veraPDF for authoritative PDF/UA-1 validation. **Most sites
 should not.** The built-in checks need nothing installed and find the problems
 that are actually in your library.
@@ -102,6 +106,8 @@ separate job, done in Acrobat or in the tool the document was written in.
 - Queued scanning with concurrency limits
 - Optional PDF/UA validation via veraPDF
 - Feeds A11y Report's conformance report as its own appendix
+- Feeds the free Site Weather dashboard tile with a Documents band, clear
+  through storm, read from the same numbers as the dashboard
 
 ## Requirements
 
@@ -116,6 +122,11 @@ Third of three. Same vocabulary, same voice, same four severities.
 - **A11y Docs** — covers the asset library.
 
 All three should surface on a marketplace search for "a11y" or "accessibility".
+
+**Site Weather** is a free companion, not a fourth product: one dashboard tile
+that shows a band per addon that reports to it. Docs reports a Documents band.
+The listing mentions it once, in the description and the features, and links
+to its own listing once that exists.
 
 ## Categories
 
@@ -139,3 +150,14 @@ together by the shared "A11y" name and the keywords below, not by a category.
 ## Keywords
 
 accessibility, a11y, pdf, pdf/ua, section 508, documents, assets, audit
+
+## Screenshots
+
+Six on the listing. After 1.4.0, retake any that show:
+
+- the **dashboard**: titled "Document checks", and every table has a header row;
+- the **remediation queue**: labelled filters, header row, pagination under the
+  table.
+
+Add one of the **Site Weather tile** with the Documents band, since it is the
+release's headline feature.
