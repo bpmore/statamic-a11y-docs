@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "90eb0c9cda4f880161253ce71afb703d",
+    "content-hash": "904630855c7549ac6cdc94aecac4e6b9",
     "packages": [
         {
             "name": "ajthinking/archetype",
@@ -9286,11 +9286,17 @@
     "packages-dev": [
         {
             "name": "bpmore/statamic-site-weather",
-            "version": "dev-main",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/bpmore/statamic-site-weather.git",
+                "reference": "36159629ef87ac45018a6d7a8b7a384b7cded841"
+            },
             "dist": {
-                "type": "path",
-                "url": "../statamic-site-weather",
-                "reference": "d28ff032bb9d1c0ebc40d432b170501359479698"
+                "type": "zip",
+                "url": "https://api.github.com/repos/bpmore/statamic-site-weather/zipball/36159629ef87ac45018a6d7a8b7a384b7cded841",
+                "reference": "36159629ef87ac45018a6d7a8b7a384b7cded841",
+                "shasum": ""
             },
             "require": {
                 "php": "^8.2",
@@ -9303,15 +9309,15 @@
             },
             "type": "statamic-addon",
             "extra": {
-                "statamic": {
-                    "name": "Site Weather",
-                    "slug": "site-weather",
-                    "description": "Your site's health as weather. Sunny, overcast, drizzle, storm."
-                },
                 "laravel": {
                     "providers": [
                         "Bpmore\\SiteWeather\\ServiceProvider"
                     ]
+                },
+                "statamic": {
+                    "name": "Site Weather",
+                    "slug": "site-weather",
+                    "description": "Your site's health as weather. Sunny, overcast, drizzle, storm."
                 }
             },
             "autoload": {
@@ -9319,19 +9325,7 @@
                     "Bpmore\\SiteWeather\\": "src/"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "Bpmore\\SiteWeather\\Tests\\": "tests/"
-                }
-            },
-            "scripts": {
-                "test": [
-                    "pest"
-                ],
-                "lint": [
-                    "pint"
-                ]
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -9350,14 +9344,11 @@
                 "widget"
             ],
             "support": {
+                "docs": "https://github.com/bpmore/statamic-site-weather/blob/main/README.md",
                 "issues": "https://github.com/bpmore/statamic-site-weather/issues",
-                "source": "https://github.com/bpmore/statamic-site-weather",
-                "docs": "https://github.com/bpmore/statamic-site-weather/blob/main/README.md"
+                "source": "https://github.com/bpmore/statamic-site-weather"
             },
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
+            "time": "2026-09-12T00:59:40+00:00"
         },
         {
             "name": "brianium/paratest",
@@ -12822,9 +12813,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "bpmore/statamic-site-weather": 20
-    },
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
