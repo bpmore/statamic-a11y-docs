@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue';
 import { Head, Link } from '@statamic/cms/inertia';
-import { Badge, Button, Card, Header, Heading, Icon, Panel, PanelHeader, Subheading, Table, TableCell, TableRow, Text } from '@statamic/cms/ui';
+import { Badge, Button, Card, Header, Heading, Icon, Panel, PanelHeader, Subheading, Table, TableCell, TableColumn, TableColumns, TableRow, TableRows, Text } from '@statamic/cms/ui';
 
 /**
  * The screen that describes the past.
@@ -46,9 +46,10 @@ const cellPadding = { paddingInline: '1.125rem' }; // = px-4.5
 </script>
 
 <template>
-    <Head title="Documents" />
+    <!-- The same words as the nav item that got somebody here. -->
+    <Head title="Document checks" />
 
-    <Header title="Documents" icon="file-content-list">
+    <Header title="Document checks" icon="file-content-list">
         <Button :href="queueUrl" variant="primary" text="Remediation queue" />
     </Header>
 
@@ -87,28 +88,44 @@ const cellPadding = { paddingInline: '1.125rem' }; // = px-4.5
         <div class="mt-6 grid gap-6 md:grid-cols-2">
             <Panel>
                 <PanelHeader><Subheading text="By format" /></PanelHeader>
+                <!-- Every table here has a header row. A screen reader user
+                     reading three unlabelled columns is the kind of thing this
+                     addon exists to report. -->
                 <Table>
-                    <TableRow v-for="(counts, format) in formats" :key="format">
-                        <TableCell class="font-medium uppercase" :style="cellPadding">{{ format }}</TableCell>
-                        <TableCell :style="cellPadding">{{ counts.total }}</TableCell>
-                        <TableCell :style="cellPadding">
-                            <Badge v-if="counts.fail" color="red" :text="`${counts.fail} failing`" />
-                            <Badge v-if="counts.pass" color="green" :text="`${counts.pass} passing`" />
-                            <Badge v-if="counts.unsupported" :text="`${counts.unsupported} not checkable`" />
-                        </TableCell>
-                    </TableRow>
+                    <TableColumns>
+                        <TableColumn scope="col" :style="cellPadding">Format</TableColumn>
+                        <TableColumn scope="col" :style="cellPadding">Documents</TableColumn>
+                        <TableColumn scope="col" :style="cellPadding">Outcome</TableColumn>
+                    </TableColumns>
+                    <TableRows>
+                        <TableRow v-for="(counts, format) in formats" :key="format">
+                            <TableCell class="font-medium uppercase" :style="cellPadding">{{ format }}</TableCell>
+                            <TableCell :style="cellPadding">{{ counts.total }}</TableCell>
+                            <TableCell :style="cellPadding">
+                                <Badge v-if="counts.fail" color="red" :text="`${counts.fail} failing`" />
+                                <Badge v-if="counts.pass" color="green" :text="`${counts.pass} passing`" />
+                                <Badge v-if="counts.unsupported" :text="`${counts.unsupported} not checkable`" />
+                            </TableCell>
+                        </TableRow>
+                    </TableRows>
                 </Table>
             </Panel>
 
             <Panel v-if="hasFindings">
                 <PanelHeader><Subheading text="Findings by severity" /></PanelHeader>
                 <Table>
-                    <TableRow v-for="(count, severity) in severities" :key="severity">
-                        <TableCell :style="cellPadding">
-                            <Badge :color="severityColor[severity]" :text="severity" />
-                        </TableCell>
-                        <TableCell :style="cellPadding">{{ count }}</TableCell>
-                    </TableRow>
+                    <TableColumns>
+                        <TableColumn scope="col" :style="cellPadding">Severity</TableColumn>
+                        <TableColumn scope="col" :style="cellPadding">Findings</TableColumn>
+                    </TableColumns>
+                    <TableRows>
+                        <TableRow v-for="(count, severity) in severities" :key="severity">
+                            <TableCell :style="cellPadding">
+                                <Badge :color="severityColor[severity]" :text="severity" />
+                            </TableCell>
+                            <TableCell :style="cellPadding">{{ count }}</TableCell>
+                        </TableRow>
+                    </TableRows>
                 </Table>
             </Panel>
         </div>
@@ -119,26 +136,39 @@ const cellPadding = { paddingInline: '1.125rem' }; // = px-4.5
                 <Text size="sm">Counted by document, because that is the number you act on.</Text>
             </PanelHeader>
             <Table>
-                <TableRow v-for="rule in rules" :key="rule.rule">
-                    <TableCell :style="cellPadding">
-                        <Link :href="`${queueUrl}?rule=${rule.rule}`">{{ rule.label }}</Link>
-                    </TableCell>
-                    <TableCell :style="cellPadding">{{ rule.documents }} {{ rule.documents === 1 ? 'document' : 'documents' }}</TableCell>
-                </TableRow>
+                <TableColumns>
+                    <TableColumn scope="col" :style="cellPadding">Rule</TableColumn>
+                    <TableColumn scope="col" :style="cellPadding">Documents</TableColumn>
+                </TableColumns>
+                <TableRows>
+                    <TableRow v-for="rule in rules" :key="rule.rule">
+                        <TableCell :style="cellPadding">
+                            <Link :href="`${queueUrl}?rule=${rule.rule}`">{{ rule.label }}</Link>
+                        </TableCell>
+                        <TableCell :style="cellPadding">{{ rule.documents }} {{ rule.documents === 1 ? 'document' : 'documents' }}</TableCell>
+                    </TableRow>
+                </TableRows>
             </Table>
         </Panel>
 
         <Panel v-if="offenders.length" class="mt-6">
             <PanelHeader><Subheading text="Worst offenders" /></PanelHeader>
             <Table>
-                <TableRow v-for="offender in offenders" :key="offender.asset_id">
-                    <TableCell class="font-mono text-xs" :style="cellPadding">{{ offender.path }}</TableCell>
-                    <TableCell :style="cellPadding">{{ offender.container }}</TableCell>
-                    <TableCell :style="cellPadding">
-                        <Badge v-if="offender.critical" color="red" :text="`${offender.critical} critical`" />
-                        <Badge :text="`${offender.findings} in total`" />
-                    </TableCell>
-                </TableRow>
+                <TableColumns>
+                    <TableColumn scope="col" :style="cellPadding">Document</TableColumn>
+                    <TableColumn scope="col" :style="cellPadding">Container</TableColumn>
+                    <TableColumn scope="col" :style="cellPadding">Findings</TableColumn>
+                </TableColumns>
+                <TableRows>
+                    <TableRow v-for="offender in offenders" :key="offender.asset_id">
+                        <TableCell class="font-mono text-xs" :style="cellPadding">{{ offender.path }}</TableCell>
+                        <TableCell :style="cellPadding">{{ offender.container }}</TableCell>
+                        <TableCell :style="cellPadding">
+                            <Badge v-if="offender.critical" color="red" :text="`${offender.critical} critical`" />
+                            <Badge :text="`${offender.findings} in total`" />
+                        </TableCell>
+                    </TableRow>
+                </TableRows>
             </Table>
         </Panel>
 

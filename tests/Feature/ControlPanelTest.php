@@ -119,6 +119,28 @@ it('filters the queue by rule, so fifty documents can be fixed in an afternoon',
         );
 });
 
+it('pages the queue in the shape the control panel\'s Pagination reads', function () {
+    // Statamic's Pagination component reads current_page, last_page, total,
+    // from and to off the payload. simplePaginate() carries none of the last
+    // three, and a queue whose second page cannot be reached from the screen
+    // is what this guards against.
+    ($this->put)('scan.pdf', 'pdf/image-only-scan.pdf');
+    $this->artisan('docs:check --sync');
+
+    $this->actingAs($this->user)
+        ->get(cp_route('a11y-docs.queue', ['severity' => 'serious', 'page' => 2]))
+        ->assertInertia(fn ($page) => $page
+            ->where('findings.current_page', 2)
+            ->where('findings.last_page', 1)
+            ->where('findings.total', 3)
+            ->has('findings.from')
+            ->has('findings.to')
+            // The filter survives the page change, so page two of "serious"
+            // is still "serious".
+            ->where('filters.severity', 'serious')
+        );
+});
+
 it('filters the queue by severity', function () {
     ($this->put)('scan.pdf', 'pdf/image-only-scan.pdf');
     $this->artisan('docs:check --sync');
