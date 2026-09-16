@@ -25,6 +25,29 @@ Clicking the band opens this addon's dashboard.
 Site Weather is suggested, not required; without it nothing changes. Upgrading
 re-reads nothing.
 
+### Fixed, in the control panel
+
+**The remediation queue can reach page two.** It has always been fifty
+findings a page, and a library with 890 untagged PDFs has far more than
+fifty, but the screen drew no way to the rest: the only route to page two was
+typing `?page=2` into the address bar. Statamic's own pagination now sits
+under the table, and the filters survive the page change.
+
+**Every table has a header row.** The queue and the four dashboard tables had
+none, so a screen reader read four unlabelled columns, on the one screen in
+the control panel that exists to report exactly that. Each column is now a
+proper `<th scope="col">`, as the exported report's tables already were.
+
+**The queue's filters carry visible labels.** "Any severity" said what a filter
+was until something was chosen, and then "critical" sat in a box with nothing
+to say it was the severity.
+
+**The dashboard is titled "Document checks"**, the same words as the nav item
+that got somebody there. It kept saying "Documents" after 1.3.2 renamed the
+item.
+
+Upgrading re-checks nothing.
+
 ## 1.3.2 - 2026-09-15
 
 ### Changed, in the control panel only
