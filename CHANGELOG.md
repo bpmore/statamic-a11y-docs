@@ -11,7 +11,7 @@ nothing.
 
 Versions are `MAJOR.MINOR.PATCH`.
 
-## Unreleased
+## 1.4.0 - 2026-09-16
 
 ### Added, for the dashboard
 
