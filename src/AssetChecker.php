@@ -12,7 +12,9 @@ use Bpmore\DocumentA11yCore\InspectionResult;
 use Bpmore\DocumentA11yCore\UncheckedRule;
 use Bpmore\DocumentA11yCore\Version;
 use Bpmore\StatamicA11yDocs\Models\DocumentCheck;
+use Bpmore\StatamicA11yDocs\Storage\DocumentDatabase;
 use Illuminate\Support\Facades\DB;
+use RuntimeException;
 use Statamic\Contracts\Assets\Asset;
 use Throwable;
 
@@ -60,37 +62,56 @@ final class AssetChecker
 
     private function attempt(Asset $asset, bool $force): DocumentCheck
     {
+        $prepared = $this->prepare($asset, $force);
+
+        return $prepared->cachedModel ?? $this->publishPrepared($asset, $prepared);
+    }
+
+    /** Read-only preparation. The caller may supervise this entire operation externally. */
+    public function prepare(Asset $asset, bool $force = false): PreparedDocumentCheck
+    {
         $existing = DocumentCheck::forAsset($asset->id())->first();
         $size = (int) $asset->size();
-
-        // Checked before the file is fetched, not after: on a remote disk the
-        // difference is a 400 MB download nobody asked for.
         if ($size > $this->maxBytes) {
-            return $this->store($asset, $existing, InspectionResult::skipped(sprintf(
+            return new PreparedDocumentCheck($asset->id(), InspectionResult::skipped(sprintf(
                 'This document is %s, over the %s limit for checking.',
-                self::megabytes($size),
-                self::megabytes($this->maxBytes),
+                self::megabytes($size), self::megabytes($this->maxBytes),
             )), null, $size, null);
         }
-
         $file = AssetFile::for($asset);
-
         try {
             $hash = hash_file('sha256', $file->path()) ?: null;
             $format = Format::detect($file->path());
             $engine = $format === null ? null : $this->inspector->inspectorFor($format)?->engine();
-
             if (! $force && $existing?->isCurrentFor($hash, $engine?->name, $engine?->version)) {
-                // The whole point. Nothing is read, parsed or written.
-                return $existing;
+                return new PreparedDocumentCheck($asset->id(), null, $hash, $size, $format,
+                    $existing->id, $engine?->name, $engine?->version, $existing);
             }
-
             $result = $this->inspector->inspect($file->path());
         } finally {
             $file->release();
         }
 
-        return $this->store($asset, $existing, $result, $hash, $size, $format);
+        return new PreparedDocumentCheck($asset->id(), $result, $hash, $size, $format);
+    }
+
+    /** Publish every prepared finding through the same native atomic transaction. */
+    public function publishPrepared(Asset $asset, PreparedDocumentCheck $prepared): DocumentCheck
+    {
+        if ($asset->id() !== $prepared->assetId) {
+            throw new RuntimeException('The prepared check belongs to another asset.');
+        }
+        $existing = DocumentCheck::forAsset($asset->id())->first();
+        if ($prepared->result === null) {
+            if (! $existing || (string) $existing->id !== (string) $prepared->cachedCheckId
+                || ! $existing->isCurrentFor($prepared->hash, $prepared->cachedEngine, $prepared->cachedVersion)) {
+                throw new RuntimeException('The cached document check changed before publication.');
+            }
+
+            return $existing;
+        }
+
+        return $this->store($asset, $existing, $prepared->result, $prepared->hash, $prepared->size, $prepared->format);
     }
 
     /** Would checking this asset do any work, or is the stored result still good? */
@@ -124,7 +145,7 @@ final class AssetChecker
         int $size,
         ?Format $format,
     ): DocumentCheck {
-        return DB::transaction(function () use ($asset, $existing, $result, $hash, $size, $format): DocumentCheck {
+        return DB::connection(DocumentDatabase::connectionName())->transaction(function () use ($asset, $existing, $result, $hash, $size, $format): DocumentCheck {
             $check = $existing ?? new DocumentCheck(['asset_id' => $asset->id()]);
 
             $check->fill([
