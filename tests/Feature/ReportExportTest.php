@@ -211,3 +211,40 @@ it('accepts a PDF written by the browser process', function () {
     expect(is_file($destination))->toBeTrue()
         ->and(filesize($destination))->toBeGreaterThan(0);
 });
+
+it('hands the browser the report from a directory only this user can enter, and removes it afterwards', function () {
+    // The report names every document in the library and what is wrong with
+    // it, and the system temp directory is shared with every account on the
+    // machine. The stub browser records where the source was and how its
+    // directory was protected, as the browser saw them.
+    $destination = ($this->tempFile)('pdf');
+    @unlink($destination);
+    $seen = ($this->tempFile)('txt');
+
+    $browser = ($this->tempFile)('sh');
+    file_put_contents($browser, str_replace('__SEEN__', $seen, <<<'SH'
+        #!/bin/sh
+        for arg in "$@"; do
+          case "$arg" in
+            --print-to-pdf=*) printf '%%PDF-1.4 stub' > "${arg#--print-to-pdf=}" ;;
+            file://*) source="${arg#file://}"; { echo "$source"; ls -ld "$(dirname "$source")"; } > "__SEEN__" ;;
+          esac
+        done
+        SH));
+    chmod($browser, 0755);
+
+    (new ChromePdfRenderer($browser, 30))->render('<p>hi</p>', $destination);
+
+    [$source, $listing] = explode("\n", trim((string) file_get_contents($seen)), 2);
+
+    expect($source)->toStartWith(sys_get_temp_dir().'/a11y-report-')
+        ->and($source)->toEndWith('/report.html')
+        // Owner only: no group or other bits, however the umask is set.
+        ->and($listing)->toStartWith('drwx------')
+        ->and(file_exists($source))->toBeFalse()
+        ->and(is_dir(dirname($source)))->toBeFalse();
+
+    @unlink($destination);
+    @unlink($seen);
+    @unlink($browser);
+});

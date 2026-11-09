@@ -49,9 +49,21 @@ final class ChromePdfRenderer implements PdfRenderer
             );
 
         // Written to a file rather than passed as a data: URL, because a report
-        // of a thousand documents is larger than a command line.
-        $source = tempnam(sys_get_temp_dir(), 'a11y-report').'.html';
-        file_put_contents($source, $html);
+        // of a thousand documents is larger than a command line. The file sits
+        // in a directory only this process's user can enter: the system temp
+        // directory is shared with every other user on the machine, and the
+        // report names every document in the library and what is wrong with
+        // it. A directory also gives the file a name nobody else can have
+        // reserved first — tempnam() reserves the name it returns, not the
+        // one with .html on the end.
+        $directory = $this->privateDirectory();
+        $source = $directory.'/report.html';
+
+        if (file_put_contents($source, $html) === false) {
+            @rmdir($directory);
+
+            throw new RuntimeException("Could not write the report to {$source}.");
+        }
 
         try {
             $process = new Process([
@@ -98,12 +110,35 @@ final class ChromePdfRenderer implements PdfRenderer
             }
         } finally {
             @unlink($source);
+            @rmdir($directory);
         }
 
         // Without this the report is a tagged PDF that still fails PDF/UA
         // validation on one clause — which, in a report about PDF/UA, is the
         // screenshot spec §12 warns about.
         $this->metadata->addTo($destination, $title);
+    }
+
+    /**
+     * A fresh directory under the system temp directory that only this user
+     * can enter (mode 0700). The name is random, and mkdir() fails rather than
+     * reuses when the name is taken, so nothing can be waiting there.
+     */
+    private function privateDirectory(): string
+    {
+        for ($attempt = 0; $attempt < 10; $attempt++) {
+            $directory = sys_get_temp_dir().'/a11y-report-'.bin2hex(random_bytes(8));
+
+            if (@mkdir($directory, 0700) && is_dir($directory)) {
+                // mkdir()'s mode is narrowed by the umask, never widened, so
+                // this only matters where the umask has taken bits away.
+                @chmod($directory, 0700);
+
+                return $directory;
+            }
+        }
+
+        throw new RuntimeException('Could not create a private temporary directory to render the report from.');
     }
 
     /**

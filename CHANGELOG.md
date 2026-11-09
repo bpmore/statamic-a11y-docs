@@ -11,6 +11,19 @@ nothing.
 
 Versions are `MAJOR.MINOR.PATCH`.
 
+## Unreleased
+
+### Fixed, in the PDF export
+
+**The report's HTML is written to a private directory while the browser
+prints it.** It was written into the shared system temp directory, under a
+name that had not been reserved, so another account on the same machine could
+read the report — which names every document in the library and what is wrong
+with it — or put a file of its own at that name first. The directory is now
+created for the one export with mode 0700, holds the one file, and is removed
+afterwards. The spare empty file that `tempnam()` left behind on every export
+is gone too. Upgrading re-reads nothing.
+
 ## 1.4.0 - 2026-09-16
 
 ### Added, for the dashboard
