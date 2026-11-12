@@ -92,3 +92,19 @@ Proprietary. One licence per production site; local development and CI are free.
 The source is published so it can be installed with Composer and inspected by
 the people who rely on it. See [LICENCE](LICENSE.md) — in particular what it
 says about the difference between a heuristic finding and PDF/UA validation.
+
+### Separating preparation from publication
+
+Integrations that supervise slow file parsing in another process may call
+`AssetChecker::prepare($asset, $force)` there. Preparation reads the source and
+existing cached result but never writes document checks or findings. Transfer the
+complete `PreparedDocumentCheck::jsonSerialize()` value, then reconstruct it with
+`PreparedDocumentCheck::fromArray()` in the publishing process.
+
+Call `AssetChecker::publishPrepared($asset, $prepared)` only after verifying that
+the source still matches the prepared hash and that the current asset is the
+same asset. The caller owns source-change coordination and deadlines. Publication
+uses the native all-findings transaction on the configured document-model
+connection. It rejects another asset's receipt and stale cached-result identities.
+It does not truncate findings or change the checker size limits or PDF engines.
+The regular `check()` API keeps its in-process behavior.
