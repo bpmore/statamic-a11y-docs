@@ -43,8 +43,12 @@ Any document can be exempted, with a **required reason** and an optional expiry.
 An exemption without a reason is a way of turning the addon off one file at a
 time, so the reason is required and has to say something.
 
-Exempt from the asset browser or the remediation queue, singly or in bulk.
-Exemptions are append-only: withdrawing one records that it was withdrawn rather
+Exempt from the asset browser or the remediation queue, singly or in bulk, with
+**Exempt from accessibility checks**. To end one, use **Withdraw accessibility
+exemption** on the same document; it appears only where there is an exemption to
+withdraw, and the document is gated again from that point.
+
+Exemptions are append-only: withdrawing one records who ended it and when rather
 than deleting the record, because that is the difference between an audit trail
 and a list.
 
@@ -52,6 +56,11 @@ and a list.
 
 The save is refused with the reason attached — which documents, what is wrong
 with them, and the way out:
+
+With A11y Gate 0.9 or newer installed, this appears in the gate's panel in the
+sidebar, in the same block that lists the documents on the page. Without it,
+Statamic will only render a validation error next to a blueprint field, so the
+refusal appears under the entry's title.
 
 > This entry links to 2 documents that people using a screen reader cannot read:
 > **reports/handbook.pdf** — This PDF has no tags. A screen reader cannot tell a

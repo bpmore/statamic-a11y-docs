@@ -103,6 +103,13 @@ it('registers its control panel nav item against a real Nav', function () {
 
     expect($ours)->not->toBeEmpty('the addon registered no control panel nav item');
     expect((string) $ours->first()->name())->not->toBeEmpty();
+
+    // Under Tools, with the other checks, and named for what it is. It was
+    // "Documents" under Content, which read as a place to manage documents
+    // and sat next to Assets, where the documents actually live. Nothing on
+    // these pages creates or edits a document; they check them.
+    expect($ours->first()->section())->toBe('Tools')
+        ->and((string) $ours->first()->display())->toBe('Document checks');
 });
 
 it('ships a Vite manifest where the control panel looks for it', function () {

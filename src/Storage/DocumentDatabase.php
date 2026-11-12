@@ -6,6 +6,7 @@ namespace Bpmore\StatamicA11yDocs\Storage;
 
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 /**
@@ -75,6 +76,34 @@ final class DocumentDatabase
     }
 
     /**
+     * Migration files this addon ships that have not run on its connection.
+     *
+     * Asked before deciding an existing install needs nothing. A version that
+     * adds a column ships a migration, and a command that returns early on
+     * "the tables exist" would leave that column missing on every site that
+     * installed an earlier version.
+     *
+     * @return list<string> basenames, in the order they would run
+     */
+    public function pendingMigrations(): array
+    {
+        $files = array_map('basename', glob($this->migrationPath().'/*.php') ?: []);
+
+        try {
+            $ran = Schema::connection(self::connectionName())->hasTable('migrations')
+                ? DB::connection(self::connectionName())->table('migrations')->pluck('migration')->all()
+                : [];
+        } catch (\Throwable) {
+            return $files;
+        }
+
+        return array_values(array_diff(
+            array_map(fn (string $file): string => substr($file, 0, -4), $files),
+            $ran,
+        ));
+    }
+
+    /**
      * Create the tables, and whatever the batch runner needs for its own
      * records, on the connections they belong to.
      *
@@ -91,7 +120,7 @@ final class DocumentDatabase
 
         Artisan::call('migrate', [
             '--database' => $connection,
-            '--path' => realpath(__DIR__.'/../../database/migrations'),
+            '--path' => $this->migrationPath(),
             '--realpath' => true,
             '--force' => true,
         ]);
@@ -149,6 +178,11 @@ final class DocumentDatabase
         $done[] = "Created the [{$table}] table on [{$batching}] for the queue's batch records.";
 
         return $done;
+    }
+
+    private function migrationPath(): string
+    {
+        return (string) realpath(__DIR__.'/../../database/migrations');
     }
 
     /**

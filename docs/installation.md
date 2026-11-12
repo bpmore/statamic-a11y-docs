@@ -22,6 +22,10 @@ A11Y_DOCS_CONNECTION=mysql
 The command asks before creating tables on a connection the site administers.
 `--force` skips the question for scripted installs.
 
+Run `docs:install` again after upgrading the package. It reports "already
+installed" when there is nothing to do, and applies any table changes a newer
+version needs.
+
 `vendor:publish` copies the control panel assets. Without it the CP reports
 "Vite manifest not found".
 
@@ -90,7 +94,7 @@ is what was actually found rather than what somebody last remembered to save.
 
 ## Permissions
 
-Three, under **Documents** in the role editor:
+Three, under **Document checks** in the role editor:
 
 | Permission | Lets somebody |
 |---|---|

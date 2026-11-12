@@ -15,6 +15,8 @@ Require the package, create the tables, and take a first look:
 
 `docs:install` creates three tables: `document_checks`, `document_findings` and `document_exemptions`. By default they go in a SQLite file the addon creates for itself under `storage/a11y-docs/`, so a flat-file site needs nothing else. To put them in a database the site already runs, set `A11Y_DOCS_CONNECTION` to one of its connection names, or set `connection` in the config, and run the command again.
 
+Run `docs:install` again after upgrading the package. It reports "already installed" when there is nothing to do, and applies any table changes a newer version needs.
+
 The first scan reads every document in every asset container. Subsequent scans read only what changed, because the check is a hash comparison.
 
 ## Configuration
@@ -60,7 +62,7 @@ Grey never means "fine". It means nothing was looked at.
 
 ## Permissions
 
-Three, under **Documents** in the role editor:
+Three, under **Document checks** in the role editor:
 
 - **View document accessibility results** - see the dashboard, the queue, and each document's findings
 - **Run document scans** - re-check a document after fixing it
@@ -122,7 +124,7 @@ So three protections ship on, and together they mean **installing this addon cha
 
 **2. Only critical problems block.** Critical means somebody genuinely cannot read the document: no tags at all, a scan with no text layer, encryption that blocks assistive technology. A document missing a language declaration is *serious*, and does not block.
 
-**3. Exemptions.** Any document can be exempted, with a required reason and an optional expiry. An exemption without a reason is a way of turning the addon off one file at a time, so the reason is required and has to say something. Exempt from the asset browser or the remediation queue, singly or in bulk. Exemptions are append-only: withdrawing one records that it was withdrawn rather than deleting the record, because that is the difference between an audit trail and a list.
+**3. Exemptions.** Any document can be exempted, with a required reason and an optional expiry. An exemption without a reason is a way of turning the addon off one file at a time, so the reason is required and has to say something. Exempt from the asset browser or the remediation queue, singly or in bulk, with **Exempt from accessibility checks**. To end one, use **Withdraw accessibility exemption** on the same document; it appears only where there is an exemption to withdraw, and the document is gated again from that point. Exemptions are append-only: withdrawing one records who ended it and when rather than deleting the record, because that is the difference between an audit trail and a list.
 
 **What a blocked publish looks like.** The save is refused with the reason attached - which documents, what is wrong with them, and the way out:
 
@@ -190,7 +192,7 @@ Run `docs:prune` occasionally to drop results for documents that have been delet
 
 The gate reads the page's rendered HTML. It cannot open a linked PDF, so an entry that links to an untagged document reads as passing there while this addon refuses the same save.
 
-When A11y Gate is installed, this addon adds a block to its entry panel listing the documents that page links to and what is wrong with them, so both addons say the same thing on the same screen. Nothing is registered when the gate is absent.
+When A11y Gate is installed, this addon adds a block to its entry panel listing the documents that page links to and what is wrong with them, so both addons say the same thing on the same screen. A refused publish is drawn in that block too, next to the documents it is about. Needs A11y Gate 0.9 or newer; with an older one the refusal appears under the entry's title field instead. Nothing is registered when the gate is absent.
 
 ## Alongside A11y Report
 

@@ -59,4 +59,23 @@ class DocumentExemption extends Model
         return $this->revoked_at === null
             && ($this->expires_at === null || $this->expires_at->isFuture());
     }
+
+    /**
+     * Withdraw this exemption: the document is checked and gated again from
+     * here on, and the row stays where it is saying who ended it and when.
+     *
+     * Already-withdrawn rows are left alone rather than re-stamped, so the
+     * recorded time is the time somebody actually decided.
+     */
+    public function withdraw(?string $userId = null): bool
+    {
+        if ($this->revoked_at !== null) {
+            return false;
+        }
+
+        $this->revoked_at = now();
+        $this->revoked_by = $userId;
+
+        return $this->save();
+    }
 }
