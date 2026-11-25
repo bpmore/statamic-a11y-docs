@@ -186,7 +186,7 @@ final class SmalotPdfReader implements PdfReader
 
         $reference = $header->get($key);
 
-        return $reference instanceof PDFObject && $pageNumbers->contains($reference)
+        return $reference instanceof PDFObject && $pageNumbers->offsetExists($reference)
             ? $pageNumbers[$reference]
             : null;
     }
